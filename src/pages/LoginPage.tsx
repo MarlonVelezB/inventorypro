@@ -1,4 +1,4 @@
-import { LoginFeatures, LoginForm, LoginHeader } from "../features/Auth";
+import { LoginFeatures, LoginForm, LoginHeader } from "../features/auth";
 
 const LoginPage = () => {
   return (

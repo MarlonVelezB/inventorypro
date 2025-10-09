@@ -51,6 +51,7 @@
 
     /* Destructive Colors */
     --color-destructive: #E74C3C;
+    --color-destructive-hover: #fcd1cbcf;
     /* red-600 */
     --color-destructive-foreground: #FFFFFF;
     /* white */

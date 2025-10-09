@@ -1,0 +1,13 @@
+.icon-dropdown {
+    transition: transform 0.2s ease;
+}
+
+.icon-dropdown.open {
+    transform: rotate(180deg);
+}
+
+@media (max-width: 720px) {
+    .dropdown-user-content{
+        display: none;
+    }
+}
