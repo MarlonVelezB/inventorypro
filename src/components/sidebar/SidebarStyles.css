@@ -1,0 +1,218 @@
+.sidebar-layout {
+    height: 100vh;
+    width: 264px;
+    background-color: white;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px, rgba(0, 0, 0, 0.06) 0px 1px 2px;
+    transition: width 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-layout.collapsed {
+    width: 80px;
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 20px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.logo-container {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--color-blue-primary);
+    /* para posicionar el elemento donde yo quiera */
+    position: relative;
+    /* para evitar que se encoja al achicar el sidebaer (collapsed)*/
+    flex-shrink: 0;
+    cursor: pointer;
+    /* para la animacion al hacer hover */
+    transition: transform 0.2s ease;
+
+}
+
+/* 
+Combinacion de clases, si el div padre tiene tanto la clase sidebar-layout como la collapsed 
+entonces solo ahi se aplica este estilo sobre el logo
+ */
+.sidebar-layout.collapsed .logo-container {
+    cursor: pointer;
+}
+
+.sidebar-layout.collapsed .logo-container:hover {
+    transform: scale(1.05);
+}
+
+/* Selecciona el .logo-container que está dentro de un .sidebar-layout
+que NO tiene la clase .collapsed. */
+/* El estilo se aplica si el div no tiene la clase collapsed */
+.sidebar-layout:not(.collapsed) .logo-container {
+    cursor: default;
+}
+
+/* Icon Transitions */
+.box-icon,
+.arrow-icon {
+    position: absolute;
+    transition: opacity var(--sidebar-transition), transform var(--sidebar-transition);
+}
+
+.box-icon {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.box-icon.hidden {
+    opacity: 0;
+    transform: scale(0.8);
+}
+
+.arrow-icon {
+    opacity: 0;
+    transform: scale(0.8);
+}
+
+.arrow-icon.visible {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.sidebar-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+    white-space: nowrap;
+    transition: opacity 0.2s ease;
+}
+
+.sidebar-layout.collapsed .sidebar-title {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.collapse-btn {
+    margin-left: auto;
+    transition: transform 0.3s ease;
+}
+
+.menu-hamburguesa {
+    display: none;
+}
+
+.sidebar-content {
+    flex: 1;
+    /* para que ocupe todo el espacio disponible aplica solo si el div padre tiene un display flex*/
+    overflow-y: auto;
+    /* para que si el contenido es muy grande aparezca un scroll vertical */
+    padding: 2rem 1rem;
+    /* espacio arriba, abajo, izquierda */
+}
+
+/* SIDEBAR MUENU */
+.nav-item {
+    display: flex;
+    align-items: center;
+    border-radius: 8px;
+    gap: 10px;
+    padding: 1rem;
+    color: #333;
+    margin-bottom: 8px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.nav-item:hover {
+    background-color: var(--color-blue-primary);
+    color: var(--color-surface);
+    cursor: pointer;
+}
+
+.nav-item-icon {
+    flex-shrink: 0;
+}
+
+.nav-item.active {
+    background-color: var(--color-blue-primary);
+    color: var(--color-surface);
+}
+
+/* DROPDOWN */
+
+.dropdown {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.icon-dropdown {
+    transition: transform 0.3s ease;
+}
+
+.icon-dropdown.rotated {
+    transform: rotate(180deg);
+}
+
+.dropdown-content {
+    /* colapsa al inicio */
+    max-height: 0;
+    /* evita que se vea el contenido colapsado */
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(10px);
+    transition: max-height 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
+}
+
+.dropdown-content.visible {
+    /* un valor mayor que el contenido real */
+    max-height: 200px;
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+    padding: 6px 0;
+    /* ahora se puede interactuar */
+}
+
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0.5rem 1rem;
+    color: #555;
+    border-radius: 8px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+@media (max-width: 768px) {
+    .sidebar-layout {
+        display: none;
+    }
+
+    .menu-hamburguesa {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 20px;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        z-index: 1100;
+        background-color: white;
+        box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px, rgba(0, 0, 0, 0.06) 0px 1px 2px;
+        cursor: pointer;
+        width: 100%;
+    }
+
+}

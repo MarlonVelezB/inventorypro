@@ -32,3 +32,12 @@ export interface InputProps {
   className?: string;
   [key: string]: any; // Allow additional props
 }
+
+export type SidebarMenuWithOptionalIcon = Omit<SidebarMenuProps, "icon"> & Partial<Pick<SidebarMenuProps, "icon">>;
+export interface SidebarMenuProps {
+  path: string;
+  name: string;
+  icon: IconName;
+  type: "link" | "dropdown";
+  children?: SidebarMenuWithOptionalIcon[];
+}
