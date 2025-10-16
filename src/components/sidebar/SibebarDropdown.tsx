@@ -3,7 +3,7 @@ import Icon from "../AppIcon";
 import type {
   IconName,
   SidebarMenuWithOptionalIcon,
-} from "../../types/componentTypes";
+} from "../../types/component.types";
 import { NavLink } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 

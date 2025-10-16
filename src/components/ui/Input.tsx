@@ -1,6 +1,6 @@
 import { Input } from "antd";
 import type React from "react";
-import type { InputProps } from "../../types/componentTypes";
+import type { InputProps } from "../../types/component.types";
 
 const InputComponet: React.FC<InputProps> = (props) => {
   return (

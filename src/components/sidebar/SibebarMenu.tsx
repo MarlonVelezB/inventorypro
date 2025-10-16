@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom";
 import Icon from "../AppIcon";
 import SidebarDropdown from "./SibebarDropdown";
-import type { SidebarMenuProps } from "../../types/componentTypes";
+import type { SidebarMenuProps } from "../../types/component.types";
 
 const ROUTES: SidebarMenuProps[] = [
   {

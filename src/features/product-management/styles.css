@@ -1,0 +1,21 @@
+.btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  white-space: nowrap !important;
+  border-radius: 0.375rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  outline: none !important;
+  pointer-events: auto !important;
+
+}
+.btn.filters:hover {
+    color: var(--color-surface) !important;
+    background-color: var(--color-accent) !important;
+}
+
+.btn.export:hover {
+    color: var(--color-surface) !important;
+    background-color: var(--color-success) !important;
+}

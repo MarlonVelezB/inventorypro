@@ -1,5 +1,5 @@
 import { Icon } from "../../components";
-import type { PageInfo } from "../../types/componentTypes";
+import type { PageInfo } from "../../types/component.types";
 
 const LoginFeatures = () => {
   const features: PageInfo[] = [
