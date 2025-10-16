@@ -1,6 +1,6 @@
 import * as LucideIcons from 'lucide-react';
 import { HelpCircle, type LucideIcon } from 'lucide-react';
-import type { IconProps } from '../types/componentTypes';
+import type { IconProps } from '../types/component.types';
 
 const Icon: React.FC<IconProps> = ({
     name,

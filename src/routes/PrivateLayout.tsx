@@ -10,7 +10,9 @@ const PrivateLayout: React.FC = () => {
       <main className="main-content">
         <Header />
         <BreadcrumbNavigation />
-        <Outlet />
+        <div className="p-5">
+          <Outlet />
+        </div>
       </main>
     </div>
   );
