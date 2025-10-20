@@ -4,17 +4,18 @@ import type { Product } from "../../types/business.types";
 import { Button, Divider } from "antd";
 import { Icon } from "../../components";
 import SelectComponent from "../../components/ui/SelectComponent";
+
 const currency = [
-  { label: "USD - Dólar estadounidense", value: "USD" },
+  { label: "USD - US Dollar", value: "USD" },
   { label: "EUR - Euro", value: "EUR" },
-  { label: "GBP - Libra esterlina", value: "GBP" },
-  { label: "JPY - Yen japonés", value: "JPY" },
-  { label: "CAD - Dólar canadiense", value: "CAD" },
-  { label: "AUD - Dólar australiano", value: "AUD" },
-  { label: "CHF - Franco suizo", value: "CHF" },
-  { label: "CNY - Yuan chino", value: "CNY" },
-  { label: "MXN - Peso mexicano", value: "MXN" },
-  { label: "BRL - Real brasileño", value: "BRL" },
+  { label: "GBP - British Pound", value: "GBP" },
+  { label: "JPY - Japanese Yen", value: "JPY" },
+  { label: "CAD - Canadian Dollar", value: "CAD" },
+  { label: "AUD - Australian Dollar", value: "AUD" },
+  { label: "CHF - Swiss Franc", value: "CHF" },
+  { label: "CNY - Chinese Yuan", value: "CNY" },
+  { label: "MXN - Mexican Peso", value: "MXN" },
+  { label: "BRL - Brazilian Real", value: "BRL" },
 ];
 
 const PriceInfoForm = () => {
@@ -41,7 +42,7 @@ const PriceInfoForm = () => {
                 {...field}
                 type="text"
                 keyName="cost"
-                label="Costo del Producto"
+                label="Product Cost"
                 placeholder="0.00"
                 required
                 errors={errors}
@@ -50,7 +51,7 @@ const PriceInfoForm = () => {
           />
         </div>
 
-        <Divider orientation="left">Precios de Venta</Divider>
+        <Divider orientation="left">Sales Prices</Divider>
 
         {/* Sección de Precios de Venta */}
         <div>
@@ -71,8 +72,8 @@ const PriceInfoForm = () => {
                           {...field}
                           type="text"
                           keyName="label"
-                          label="Etiqueta"
-                          placeholder="Ej: Precio al por mayor"
+                          label="Label"
+                          placeholder="e.g. Wholesale Price"
                           required
                           errors={errors.prices?.[index] || {}}
                         />
@@ -93,7 +94,7 @@ const PriceInfoForm = () => {
                             {...field}
                             type="text"
                             keyName="amount"
-                            label="Monto"
+                            label="Amount"
                             placeholder="0.00"
                             required
                             errors={errors.prices?.[index] || {}}
@@ -109,7 +110,7 @@ const PriceInfoForm = () => {
                           <SelectComponent
                             {...field}
                             keyName="currency"
-                            label="Moneda"
+                            label="Currency"
                             placeholder="USD"
                             errors={errors.prices?.[index] || {}}
                             required
@@ -126,7 +127,7 @@ const PriceInfoForm = () => {
                       type="button"
                       onClick={() => remove(index)}
                       className="mt-8 p-2 text-red-500 hover:bg-red-50 rounded transition"
-                      title="Eliminar precio"
+                      title="Remove price"
                     >
                       <Icon name="Trash2" />
                     </button>
@@ -149,7 +150,7 @@ const PriceInfoForm = () => {
               }
               className="text-blue-500 border-blue-500 hover:bg-blue-50"
             >
-              Agregar Otro Precio
+              Add Another Price
             </Button>
           </div>
 

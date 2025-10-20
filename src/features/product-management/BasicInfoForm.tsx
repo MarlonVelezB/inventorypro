@@ -13,7 +13,7 @@ export type BasicProductInfo = Pick<
 const BasicInfoForm = () => {
   const [_, setImagePreviewUrl] = useState(null);
 
-  const { 
+  const {
     control,
     watch,
     formState: { errors },
@@ -38,7 +38,7 @@ const BasicInfoForm = () => {
         url: dataUrl,
         alt: "",
       });
-      message.success("Imagen agregada correctamente");
+      message.success("Image added successfully");
     };
     reader.readAsDataURL(file);
     return false;
@@ -50,13 +50,19 @@ const BasicInfoForm = () => {
         {/* Campo Nombre */}
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-2">
-            Nombre del Producto *
+            Product Name *
           </label>
           <Controller
             name="name"
             control={control}
             render={({ field }) => (
-              <InputForm keyName="name" placeholder="Ej: Laptop Gaming Pro" errors={errors} type="text" {...field}/>
+              <InputForm
+                keyName="name"
+                placeholder="e.g. Gaming Laptop Pro"
+                errors={errors}
+                type="text"
+                {...field}
+              />
             )}
           />
         </div>
@@ -64,13 +70,19 @@ const BasicInfoForm = () => {
         {/* Campo SKU */}
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-2">
-            SKU (Código del Producto) *
+            SKU (Product Code) *
           </label>
           <Controller
             name="sku"
             control={control}
             render={({ field }) => (
-              <InputForm keyName="sku" placeholder="Ej: SKU-001-LAPTOP" errors={errors} type="text" {...field}/>
+              <InputForm
+                keyName="sku"
+                placeholder="e.g. SKU-001-LAPTOP"
+                errors={errors}
+                type="text"
+                {...field}
+              />
             )}
           />
         </div>
@@ -78,13 +90,19 @@ const BasicInfoForm = () => {
         {/* Campo Descripción */}
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-2">
-            Descripción
+            Description
           </label>
           <Controller
             name="description"
             control={control}
             render={({ field }) => (
-              <InputForm keyName="description" placeholder="Describe las caracteristicas de tu producto..." errors={errors} type="textarea" {...field}/>
+              <InputForm
+                keyName="description"
+                placeholder="Describe your product features..."
+                errors={errors}
+                type="textarea"
+                {...field}
+              />
             )}
           />
         </div>
@@ -94,7 +112,7 @@ const BasicInfoForm = () => {
         {/* Sección de Imágenes */}
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-4">
-            Imágenes del Producto
+            Product Images
           </label>
 
           {fields.length === 0 ? (
@@ -103,7 +121,7 @@ const BasicInfoForm = () => {
                 name="Camera"
                 className="w-8 h-8 text-slate-400 mx-auto mb-2"
               />
-              <p className="text-slate-500 mb-4">No hay imágenes agregadas</p>
+              <p className="text-slate-500 mb-4">No images added</p>
               <Upload
                 accept="image/*"
                 beforeUpload={handleImageUpload}
@@ -114,7 +132,7 @@ const BasicInfoForm = () => {
                   icon={<Icon name="Plus" className="w-4 h-4" />}
                   className="text-blue-500 border-blue-500 hover:bg-blue-50"
                 >
-                  Subir Primera Imagen
+                  Upload First Image
                 </Button>
               </Upload>
             </div>
@@ -128,7 +146,7 @@ const BasicInfoForm = () => {
                   <div className="flex-1">
                     <div className="mb-3">
                       <label className="block text-xs font-medium text-slate-600 mb-1">
-                        URL de la Imagen
+                        Image URL
                       </label>
                       <Controller
                         name={`images.${index}.url`}
@@ -137,7 +155,7 @@ const BasicInfoForm = () => {
                           <input
                             {...field}
                             type="text"
-                            placeholder="https://ejemplo.com/imagen.jpg"
+                            placeholder="https://example.com/image.jpg"
                             className={`w-full px-3 py-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition ${
                               errors.images?.[index]?.url
                                 ? "border-red-500"
@@ -156,7 +174,7 @@ const BasicInfoForm = () => {
 
                     <div>
                       <label className="block text-xs font-medium text-slate-600 mb-1">
-                        Texto Alternativo (ALT)
+                        Alt Text
                       </label>
                       <Controller
                         name={`images.${index}.alt`}
@@ -165,7 +183,7 @@ const BasicInfoForm = () => {
                           <input
                             {...field}
                             type="text"
-                            placeholder="Describe la imagen..."
+                            placeholder="Describe the image..."
                             className="w-full px-3 py-2 border border-slate-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                           />
                         )}
@@ -187,7 +205,7 @@ const BasicInfoForm = () => {
                     type="button"
                     onClick={() => remove(index)}
                     className="mt-8 p-2 text-red-500 hover:bg-red-50 rounded transition"
-                    title="Eliminar imagen"
+                    title="Delete image"
                   >
                     <Icon name="Trash2" className="w-5 h-5" />
                   </button>
@@ -205,7 +223,7 @@ const BasicInfoForm = () => {
                   block
                   className="text-blue-500 border-blue-500 hover:bg-blue-50 mt-4"
                 >
-                  Agregar Otra Imagen
+                  Add Another Image
                 </Button>
               </Upload>
             </div>

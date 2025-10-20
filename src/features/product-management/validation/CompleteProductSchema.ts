@@ -1,35 +1,35 @@
-// schemas_nested.ts (Esquemas para tipos de arrays/objetos anidados)
+// schemas_nested.ts (Schemas for nested array/object types)
 import * as yup from "yup";
 import type { Product } from "../../../types/business.types";
 
-// Esquema para la estructura Price
+// Schema for Price structure
 export const PriceSchema = yup.object({
-  label: yup.string().required("La etiqueta es requerida."),
+  label: yup.string().required("Label is required."),
   amount: yup
     .number()
-    .typeError("Debe ser un número válido.")
-    .positive("El monto debe ser positivo.")
-    .required("El monto es requerido."),
-  currency: yup.string().required("La moneda es requerida."),
+    .typeError("Must be a valid number.")
+    .positive("Amount must be positive.")
+    .required("Amount is required."),
+  currency: yup.string().required("Currency is required."),
 });
 
-// Esquema para la estructura ProductImage
+// Schema for ProductImage structure
 export const ProductImageSchema = yup.object({
   url: yup
     .string()
-    .url("Debe ser una URL válida.")
-    .required("La URL es requerida."),
+    .url("Must be a valid URL.")
+    .required("URL is required."),
   alt: yup.string().optional(),
   isPrimary: yup.boolean().optional(),
 });
 
-// Esquema para la estructura CustomAttribute (Additional Features)
+// Schema for CustomAttribute structure (Additional Features)
 export const CustomAttributeSchema = yup.object({
-  key: yup.string().required("La clave es requerida."),
-  value: yup.string().required("El valor es requerido."),
+  key: yup.string().required("Key is required."),
+  value: yup.string().required("Value is required."),
 });
 
-// Esquema básico para WarehouseStock (para el objeto anidado)
+// Basic schema for WarehouseStock (for nested object)
 export const WarehouseStockSchema = yup.object({
   warehouseId: yup.string().required(),
   quantity: yup.number().min(0).required(),
@@ -37,12 +37,12 @@ export const WarehouseStockSchema = yup.object({
 });
 
 export const BasicInfoSchema = yup.object({
-  name: yup.string().required("El nombre del producto es obligatorio."),
+  name: yup.string().required("Product name is required."),
   description: yup.string().optional(),
-  sku: yup.string().required("El SKU es obligatorio."),
+  sku: yup.string().required("SKU is required."),
   images: yup.array().of(ProductImageSchema).optional(),
 
-  // Incluimos campos calculados/de trazabilidad para que el tipo coincida con Product, pero los hacemos opcionales.
+  // Include calculated/tracking fields to match Product type, but optional.
   createdAt: yup.string().optional(),
   updatedAt: yup.string().optional(),
 });
@@ -50,35 +50,35 @@ export const BasicInfoSchema = yup.object({
 export const PricingSchema = yup.object({
   cost: yup
     .number()
-    .typeError("El costo debe ser un número.")
-    .min(0, "El costo no puede ser negativo.")
-    .required("El costo es obligatorio."),
+    .typeError("Cost must be a number.")
+    .min(0, "Cost cannot be negative.")
+    .required("Cost is required."),
   prices: yup
     .array()
     .of(PriceSchema)
-    .min(1, "Debe definir al menos un precio de venta.")
-    .required("La lista de precios es obligatoria."),
+    .min(1, "At least one sale price must be defined.")
+    .required("Price list is required."),
 });
 
 export const InventorySchema = yup.object({
-  // quantity es calculado, por lo que solo validamos que sea un número.
+  // quantity is calculated, so only validate it is a number.
   quantity: yup
     .number()
-    .min(0, "La cantidad debe ser no negativa.")
-    .required("La cantidad es obligatoria."),
+    .min(0, "Quantity must be non-negative.")
+    .required("Quantity is required."),
 
   minStock: yup
     .number()
-    .min(0, "El stock mínimo no puede ser negativo.")
+    .min(0, "Minimum stock cannot be negative.")
     .optional(),
   maxStock: yup
     .number()
-    .min(0, "El stock máximo no puede ser negativo.")
+    .min(0, "Maximum stock cannot be negative.")
     .optional(),
 
-  // warehouseStocks es un Record<string, WarehouseStock>. Validamos que sea un objeto
-  // y la validación de sus claves internas se maneja dentro del componente de la pestaña.
-  // Usamos yup.lazy() o yup.object().optional() para manejar el tipo Record<> de forma flexible.
+  // warehouseStocks is a Record<string, WarehouseStock>. We validate it is an object
+  // internal keys validation is handled inside the tab component.
+  // Use yup.lazy() or yup.object().optional() to handle Record<> type flexibly.
   warehouseStocks: yup.object().optional(),
 });
 
@@ -86,7 +86,7 @@ export const FeaturesSchema = yup.object({
   additionalFeatures: yup.array().of(CustomAttributeSchema).optional(),
   status: yup
     .string()
-    .oneOf(["ACTIVE", "INACTIVE", "DISCONTINUED"], "Estado no válido.")
+    .oneOf(["ACTIVE", "INACTIVE", "DISCONTINUED"], "Invalid status.")
     .optional(),
   tags: yup.array().of(yup.string()).optional(),
 });

@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
 import Sidebar from "../components/sidebar/Sidebar";
-import './styles.css';
+import "./styles.css";
 import { BreadcrumbNavigation, Header } from "../components";
 
 const PrivateLayout: React.FC = () => {

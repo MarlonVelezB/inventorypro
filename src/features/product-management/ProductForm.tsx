@@ -10,11 +10,14 @@ import InventoryInfoForm from "./InventoryInfoForm";
 import CustomAttributeForm from "./CustomAttributeForm";
 import { Icon } from "../../components";
 import type { IconName } from "../../types/component.types";
+import useErrorStore from "../../store/ErrorStore";
 
 const ProductForm = () => {
   const methods = useForm<Product>({
     resolver: yupResolver(CombinedProductSchema),
   });
+
+  const { submitErrors } = useErrorStore();
 
   const onSubmit = (data: Product) => {
     // Si llegamos aquí, TODOS los campos de todas las pestañas son VÁLIDOS.
@@ -24,7 +27,7 @@ const ProductForm = () => {
   const headerTab = ({ title, icon }: { title: string; icon?: IconName }) => {
     return (
       <div className="flex items-center gap-1">
-        {icon && <Icon name={icon} size={16}/>}
+        {icon && <Icon name={icon} size={16} />}
         <span>{title}</span>
       </div>
     );
@@ -38,30 +41,46 @@ const ProductForm = () => {
     },
     {
       key: "2",
-      label: headerTab({title: "Prices", icon: "DollarSign"}),
+      label: headerTab({ title: "Prices", icon: "DollarSign" }),
       children: <PriceInfoForm />,
     },
     //
     {
       key: "3",
-      label: headerTab({title: "Inventory", icon: "Box"}),
+      label: headerTab({ title: "Inventory", icon: "Box" }),
       children: <InventoryInfoForm />,
     },
     {
       key: "4",
-      label: headerTab({title: "Custom Attributes", icon: "Columns3Cog"}),
+      label: headerTab({ title: "Custom Attributes", icon: "Columns3Cog" }),
       children: <CustomAttributeForm />,
     },
   ];
 
+  const handleError = (errors: any) => {
+    console.error("❌ Errores de validación:", errors);
+    submitErrors(Object.entries(errors));
+  };
+
   return (
-    <FormProvider {...methods}>
-      <form onSubmit={methods.handleSubmit(onSubmit)}>
-        <Tabs defaultActiveKey="1" items={items} />
-        {/* El botón de SUBMIT que valida todo */}
-        <Button htmlType="submit">Validar Todos y Guardar</Button>
-      </form>
-    </FormProvider>
+    <div>
+      <FormProvider {...methods}>
+        <form onSubmit={methods.handleSubmit(onSubmit, handleError)}>
+          <Tabs defaultActiveKey="1" items={items} />
+          {/* El botón de SUBMIT que valida todo */}
+          <div className="flex justify-end mt-6">
+            <Button
+              htmlType="submit"
+              type="primary"
+              icon={<Icon name="Check" size={20} />}
+              size="large"
+            >
+              Validate and Save
+            </Button>
+          </div>
+        </form>
+      </FormProvider>
+    </div>
   );
 };
 
