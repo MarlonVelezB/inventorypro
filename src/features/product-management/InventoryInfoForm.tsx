@@ -31,42 +31,42 @@ const InventoryInfoForm: React.FC = () => {
   const handleAddWarehouse = () => {
     // Valido que se haya seleccionado una bodega
     if (!warehouseSelected) {
-      messageApi.warning("Selecciona una bodega");
+      messageApi.warning("Please select a warehouse");
       return;
     }
 
     // Obtengo las bodegas actuales
     const currentStocks = watch("warehouseStocks") || {};
 
-    // Valido que la bodeha seleccionado no haya sigo seleccionada antes
+    // Valido que la bodega seleccionada no haya sido agregada antes
     if (currentStocks[warehouseSelected]) {
-      messageApi.warning("Esta bodega ya está agregada");
+      messageApi.warning("This warehouse has already been added");
       return;
     }
 
-    // Creo mi obj nuevo stock por bodega
+    // Creo mi nuevo objeto de stock por bodega
     const newStock: WarehouseStock = {
       warehouseId: warehouseSelected,
       quantity: 0,
       updatedAt: new Date().toISOString(),
     };
 
-    // Actualizo mi stock por bodega actual con el nuevo registro
+    // Actualizo el stock con el nuevo registro
     const updatedStocks = {
       ...currentStocks,
       [warehouseSelected]: newStock,
     };
 
-    // Seteo en el control de form para capturar el cambio
+    // Seteo en el formulario
     setValue("warehouseStocks", updatedStocks);
 
-    // Seteo en mi estado local para listar las bodegas agregadas
+    // Seteo en el estado local para listar las bodegas agregadas
     setWarehouseEntries([
       ...warehouseEntries,
       { key: warehouseSelected, data: newStock },
     ]);
 
-    messageApi.success("Bodega agregada");
+    messageApi.success("Warehouse added");
     setWarehouseSelected(null);
   };
 
@@ -74,22 +74,20 @@ const InventoryInfoForm: React.FC = () => {
     warehouseId: string,
     quantity: any
   ) => {
-    // Obtengo la info de los stoks ya registrados
+    // Obtengo la info de los stocks registrados
     const currentStocks = watch("warehouseStocks") || {};
-    // Creo un nuevo obj con el nuevo stock agregado
+
+    // Creo un nuevo objeto con la cantidad actualizada
     const updatedStocks = {
-      // spread para propagar los elementos existentes en el nuevo obj
       ...currentStocks,
       [warehouseId]: {
-        // propago el elemento si llegara a existir ya en la estructura anterior
         ...currentStocks[warehouseId],
         quantity: Number(quantity.target.value),
         updatedAt: new Date().toISOString(),
       },
     };
 
-    console.log("updatedStocks: ", updatedStocks);
-    // seteo la nueva data actualizado en el form
+    // Seteo la nueva data actualizada en el form
     setValue("warehouseStocks", updatedStocks);
   };
 
@@ -100,7 +98,7 @@ const InventoryInfoForm: React.FC = () => {
     setValue("warehouseStocks", remainingStocks);
     setWarehouseEntries(warehouseEntries.filter((e) => e.key !== warehouseId));
 
-    message.success("Bodega eliminada");
+    message.success("Warehouse removed");
   };
 
   const getWarehouseData = (warehouseId: string) => {
@@ -133,7 +131,7 @@ const InventoryInfoForm: React.FC = () => {
           />
         </div>
 
-        {/* Campo de Cantidad */}
+        {/* Campos de Stock Mínimo y Máximo */}
         <div className="flex items-center gap-4">
           <Controller
             name="minStock"
@@ -166,8 +164,9 @@ const InventoryInfoForm: React.FC = () => {
           />
         </div>
 
+        {/* Activar o desactivar stock por bodega */}
         <div className="flex flex-col gap-3">
-          <label htmlFor="stockType">Stock por Bodega?</label>
+          <label htmlFor="stockType">Stock by Warehouse?</label>
           <Switch
             value={activeStockByWarehouse}
             onChange={() => setActiveStockByWarehouse(!activeStockByWarehouse)}
@@ -177,14 +176,16 @@ const InventoryInfoForm: React.FC = () => {
           />
         </div>
 
+        {/* Si el stock por bodega está activo */}
         {activeStockByWarehouse && (
           <div>
-            <Divider orientation="left">Asignación por Almacén</Divider>
+            <Divider orientation="left">Warehouse Assignment</Divider>
+
             {/* Agregar Bodega */}
             {warehouses.length > 0 && (
               <div className="flex gap-2 mb-4">
                 <Select
-                  placeholder="Selecciona una bodega"
+                  placeholder="Select a warehouse"
                   className="flex-1"
                   value={warehouseSelected}
                   onChange={(value: any) => setWarehouseSelected(value)}
@@ -199,7 +200,7 @@ const InventoryInfoForm: React.FC = () => {
                   disabled={warehouses.length === 0}
                   onClick={handleAddWarehouse}
                 >
-                  Agregar
+                  Add
                 </Button>
               </div>
             )}
@@ -208,7 +209,7 @@ const InventoryInfoForm: React.FC = () => {
             <div className="space-y-3 mb-4">
               {warehouseEntries.length === 0 ? (
                 <div className="text-center py-8 border-2 border-dashed border-slate-300 rounded-lg bg-slate-50">
-                  <p className="text-slate-500">No hay bodegas asignadas</p>
+                  <p className="text-slate-500">No warehouses assigned</p>
                 </div>
               ) : (
                 warehouseEntries.map((entry) => {
@@ -223,7 +224,7 @@ const InventoryInfoForm: React.FC = () => {
                           {warehouse?.name}
                         </h5>
                         <small className="text-(--color-muted-foreground)">
-                          Código: {warehouse?.code}
+                          Code: {warehouse?.code}
                         </small>
                       </div>
 
@@ -247,6 +248,7 @@ const InventoryInfoForm: React.FC = () => {
                             onClick={() =>
                               handleRemoveWarehouse(entry.data.warehouseId)
                             }
+                            title="Remove warehouse"
                           />
                         </div>
                       </div>

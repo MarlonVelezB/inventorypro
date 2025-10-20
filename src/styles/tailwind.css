@@ -38,7 +38,8 @@
     /* gray-500 */
 
     /* Primary Colors */
-    --color-primary: #1B4B8C;
+    --color-primary: #1577ff;
+    --color-primary-1: #1B4B8C;
     /* blue-800 */
     --color-primary-foreground: #FFFFFF;
     /* white */
@@ -70,6 +71,21 @@
 
     /* Warning Colors */
     --color-warning: #F39C12;
+    --color-warning-50: #FFF8E6;
+    /* Muy claro (fondo suave) */
+    --color-warning-100: #FFE8B3;
+    --color-warning-200: #FFD380;
+    --color-warning-300: #FFBE4D;
+    --color-warning-400: #FCA311;
+    /* Más vibrante */
+    --color-warning-500: #F39C12;
+    /* Base (color principal) */
+    --color-warning-600: #DB8A0F;
+    /* Un poco más oscuro */
+    --color-warning-700: #B36E0C;
+    --color-warning-800: #8A5209;
+    --color-warning-900: #613705;
+    /* Muy oscuro (texto o bordes fuertes) */
     /* yellow-500 */
     --color-warning-foreground: #FFFFFF;
     /* white */

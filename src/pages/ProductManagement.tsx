@@ -5,21 +5,17 @@ import {
   ProductTable,
 } from "../features/product-management";
 import useModalStore from "../store/ModalStore";
+import { HeaderSection } from "../components";
 
 const ProductManagement = () => {
-  const {showModal, closeModal} = useModalStore();
+  const { showModal, closeModal } = useModalStore();
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">
-          Gestión de Productos
-        </h1>
-        <p className="text-muted-foreground mt-1">
-          Administra tu inventario de productos y controla el stock en múltiples
-          almacenes
-        </p>
-      </div>
+      <HeaderSection
+        title="Product Management"
+        sectionDescription="Manage your product inventory and control stock across multiple warehouses."
+      />
 
       <ProductHeaderPanel />
       <ProductTable />

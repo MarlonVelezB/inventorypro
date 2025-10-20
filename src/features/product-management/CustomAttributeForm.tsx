@@ -41,14 +41,12 @@ const CustomAttributeForm: React.FC = () => {
     );
 
     if (!tagExist) {
-      appendTag({
-        value: newTagValue,
-      });
-      messageApi.success("Tag agregado");
+      appendTag({ value: newTagValue });
+      messageApi.success("Tag added");
       setNewTagValue("");
       setShowInputtag(false);
     } else {
-      messageApi.error("Este Tag ya fue agregado");
+      messageApi.error("This tag has already been added");
       inputRef.current?.select();
     }
   };
@@ -65,7 +63,7 @@ const CustomAttributeForm: React.FC = () => {
               {...field}
               className="w-full"
               keyName="status"
-              label="Estado de producto"
+              label="Product Status"
               placeholder="ACTIVE"
               required={false}
               errors={errors}
@@ -81,14 +79,14 @@ const CustomAttributeForm: React.FC = () => {
 
         <Divider orientation="left">Product Tags</Divider>
         <div className="space-y-4">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             <Button
               type="dashed"
               icon={<Icon name="Plus" />}
               onClick={() => setShowInputtag(true)}
               className="text-blue-500 border-blue-500 hover:bg-blue-50 w-fit"
             >
-              Agregar Tag
+              Add Tag
             </Button>
 
             {showInputTag && (
@@ -97,6 +95,7 @@ const CustomAttributeForm: React.FC = () => {
                   ref={inputRef}
                   value={newTagValue}
                   type="text"
+                  placeholder="Enter a tag name"
                   onChange={(value) => setNewTagValue(value.target.value)}
                 />
                 <div className="flex items-center">
@@ -119,7 +118,7 @@ const CustomAttributeForm: React.FC = () => {
 
             {fieldsTag.length === 0 && (
               <div className="text-center p-2 border-2 border-dashed border-slate-300 rounded-lg bg-slate-50 w-full">
-                <p className="text-slate-500">No Tags definidos</p>
+                <p className="text-slate-500">No tags defined</p>
               </div>
             )}
 
@@ -151,7 +150,7 @@ const CustomAttributeForm: React.FC = () => {
             >
               <div className="flex items-start gap-4">
                 <div className="flex-1 space-y-4">
-                  {/* Label del Precio */}
+                  {/* Label del atributo */}
                   <Controller
                     name={`additionalFeatures.${index}.key`}
                     control={control}
@@ -160,8 +159,8 @@ const CustomAttributeForm: React.FC = () => {
                         {...field}
                         type="text"
                         keyName="label"
-                        label="Etiqueta"
-                        placeholder="Ej: Color, Tamaño, Material"
+                        label="Label"
+                        placeholder="e.g. Color, Size, Material"
                         required
                         errors={errors.additionalFeatures?.[index] || {}}
                       />
@@ -176,21 +175,22 @@ const CustomAttributeForm: React.FC = () => {
                         {...field}
                         type="text"
                         keyName="value"
-                        label="Valor"
-                        placeholder="Ej: Azul, XL, 100%Algodon"
+                        label="Value"
+                        placeholder="e.g. Blue, XL, 100% Cotton"
                         required
                         errors={errors.additionalFeatures?.[index] || {}}
                       />
                     )}
                   />
                 </div>
-                {/* Botón Eliminar */}
+
+                {/* Botón eliminar atributo */}
                 {fieldsAttribute.length > 1 && (
                   <button
                     type="button"
                     onClick={() => removeAttribute(index)}
                     className="mt-8 p-2 text-red-500 hover:bg-red-50 rounded transition"
-                    title="Eliminar precio"
+                    title="Delete attribute"
                   >
                     <Icon name="Trash2" />
                   </button>
@@ -211,7 +211,7 @@ const CustomAttributeForm: React.FC = () => {
             }
             className="text-blue-500 border-blue-500 hover:bg-blue-50"
           >
-            Agregar Attribute
+            Add Attribute
           </Button>
         </div>
       </div>
