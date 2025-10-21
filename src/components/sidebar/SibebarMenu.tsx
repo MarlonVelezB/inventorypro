@@ -22,7 +22,7 @@ const ROUTES: SidebarMenuProps[] = [
     icon: "FileText",
     type: "dropdown",
     children: [
-      { path: "/pre-invoice-generator", name: "Pre-Invoice", type: "link" },
+      { path: "/voucher/pre-invoice", name: "Pre-Invoice", type: "link" },
     ],
   },
   {

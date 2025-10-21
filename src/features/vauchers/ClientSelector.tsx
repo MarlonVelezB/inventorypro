@@ -1,6 +1,6 @@
-import { Input } from 'antd';
-import { useState, useRef, useEffect } from 'react';
-import { Icon } from '../../components';
+import { Input } from "antd";
+import { useState, useRef, useEffect } from "react";
+import { Icon } from "../../components";
 
 // ========================================
 // INTERFACES Y TIPOS
@@ -47,7 +47,7 @@ const MOCK_CLIENTS: Client[] = [
     email: "maria.garcia@email.com",
     phone: "+34 666 123 456",
     address: "Calle Mayor 123, Madrid",
-    code: "CLI-001"
+    code: "CLI-001",
   },
   {
     id: 2,
@@ -56,7 +56,7 @@ const MOCK_CLIENTS: Client[] = [
     email: "juan.perez@email.com",
     phone: "+34 677 987 654",
     address: "Avenida Libertad 45, Barcelona",
-    code: "CLI-002"
+    code: "CLI-002",
   },
   {
     id: 3,
@@ -65,7 +65,7 @@ const MOCK_CLIENTS: Client[] = [
     email: "ana.rodriguez@email.com",
     phone: "+34 688 555 777",
     address: "Plaza España 8, Valencia",
-    code: "CLI-003"
+    code: "CLI-003",
   },
   {
     id: 4,
@@ -74,45 +74,46 @@ const MOCK_CLIENTS: Client[] = [
     email: "carlos.fernandez@email.com",
     phone: "+34 699 111 222",
     address: "Calle Sol 67, Sevilla",
-    code: "CLI-004"
-  }
+    code: "CLI-004",
+  },
 ];
 
 // ========================================
 // COMPONENTE PRINCIPAL
 // ========================================
 
-const ClientSelector: React.FC<ClientSelectorProps> = ({ 
-  selectedClient, 
-  onClientSelect, 
-  className = '' 
+const ClientSelector: React.FC<ClientSelectorProps> = ({
+  selectedClient,
+  onClientSelect,
+  className = "",
 }) => {
   // ========================================
   // ESTADOS
   // ========================================
-  
+
   /**
    * searchTerm: Almacena el texto que el usuario escribe en el input
    * Se usa para filtrar la lista de clientes
    */
-  const [searchTerm, setSearchTerm] = useState('');
-  
+  const [searchTerm, setSearchTerm] = useState("");
+
   /**
    * isDropdownOpen: Controla si el dropdown de resultados está visible
    * true = dropdown visible, false = dropdown oculto
    */
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  
+
   /**
    * filteredClients: Lista de clientes filtrados según el término de búsqueda
    * Se actualiza cada vez que cambia searchTerm
    */
-  const [filteredClients, setFilteredClients] = useState<Client[]>(MOCK_CLIENTS);
+  const [filteredClients, setFilteredClients] =
+    useState<Client[]>(MOCK_CLIENTS);
 
   // ========================================
   // REFS
   // ========================================
-  
+
   /**
    * dropdownRef: Referencia al contenedor del dropdown
    * Se usa para detectar clicks fuera del componente y cerrarlo
@@ -123,11 +124,11 @@ const ClientSelector: React.FC<ClientSelectorProps> = ({
   // ========================================
   // EFFECTS
   // ========================================
-  
+
   /**
    * Effect para cerrar el dropdown cuando se hace click fuera
    * Se ejecuta solo una vez al montar el componente
-   * 
+   *
    * CÓMO FUNCIONA:
    * 1. Agrega un listener al documento para detectar clicks
    * 2. Si el click es fuera del dropdown, lo cierra
@@ -136,22 +137,25 @@ const ClientSelector: React.FC<ClientSelectorProps> = ({
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       // Verificamos si el click fue fuera del dropdown
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsDropdownOpen(false);
       }
     };
 
     // Agregamos el listener al documento
-    document.addEventListener('mousedown', handleClickOutside);
-    
+    document.addEventListener("mousedown", handleClickOutside);
+
     // Cleanup: removemos el listener al desmontar
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []); // [] significa que solo se ejecuta al montar/desmontar
 
   /**
    * Effect para filtrar clientes cuando cambia el término de búsqueda
    * Se ejecuta cada vez que searchTerm cambia
-   * 
+   *
    * CÓMO FUNCIONA:
    * 1. Si hay texto de búsqueda, filtra los clientes
    * 2. Busca coincidencias en: nombre, DNI, código y email
@@ -160,11 +164,12 @@ const ClientSelector: React.FC<ClientSelectorProps> = ({
   useEffect(() => {
     if (searchTerm.trim()) {
       // Filtramos clientes que coincidan con el término de búsqueda
-      const filtered = MOCK_CLIENTS.filter(client =>
-        client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        client.dni.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        client.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        client.email.toLowerCase().includes(searchTerm.toLowerCase())
+      const filtered = MOCK_CLIENTS.filter(
+        (client) =>
+          client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          client.dni.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          client.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          client.email.toLowerCase().includes(searchTerm.toLowerCase())
       );
       setFilteredClients(filtered);
     } else {
@@ -176,7 +181,7 @@ const ClientSelector: React.FC<ClientSelectorProps> = ({
   // ========================================
   // HANDLERS (Manejadores de eventos)
   // ========================================
-  
+
   /**
    * Maneja el cambio en el input de búsqueda
    * Se ejecuta en cada tecla presionada
@@ -202,7 +207,7 @@ const ClientSelector: React.FC<ClientSelectorProps> = ({
    */
   const handleClearSelection = () => {
     onClientSelect(null); // Deseleccionamos el cliente
-    setSearchTerm(''); // Limpiamos el input
+    setSearchTerm(""); // Limpiamos el input
     setIsDropdownOpen(false); // Cerramos el dropdown
   };
 
@@ -217,25 +222,24 @@ const ClientSelector: React.FC<ClientSelectorProps> = ({
   // ========================================
   // RENDER
   // ========================================
-  
+
   return (
     // Contenedor principal con referencia para detectar clicks externos
     <div className={`relative ${className}`} ref={dropdownRef}>
       <div className="space-y-4">
-        
         {/* HEADER: Título y botón de limpiar */}
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-foreground">
-            Selección de Cliente
+            Client Selection
           </h3>
-          
+
           {/* Botón para limpiar - solo visible si hay cliente seleccionado */}
           {selectedClient && (
             <button
               onClick={handleClearSelection}
               className="text-sm text-destructive hover:text-destructive/80 transition-smooth"
             >
-              Limpiar selección
+              Clear selection
             </button>
           )}
         </div>
@@ -244,7 +248,7 @@ const ClientSelector: React.FC<ClientSelectorProps> = ({
         <div className="relative">
           <Input
             type="text"
-            placeholder="Buscar cliente por nombre, DNI, código o email..."
+            placeholder="Search client by name, ID, code, or email..."
             value={searchTerm}
             onChange={handleSearchChange}
             onFocus={handleInputFocus}
@@ -261,7 +265,6 @@ const ClientSelector: React.FC<ClientSelectorProps> = ({
         {selectedClient && (
           <div className="bg-muted/50 border border-border rounded-lg p-4">
             <div className="flex items-start justify-between">
-              
               {/* Información del cliente */}
               <div className="space-y-2">
                 {/* Nombre del cliente */}
@@ -271,12 +274,12 @@ const ClientSelector: React.FC<ClientSelectorProps> = ({
                     {selectedClient.name}
                   </span>
                 </div>
-                
+
                 {/* Grid con datos del cliente (DNI, email, phone, código) */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-muted-foreground">
                   <div className="flex items-center space-x-2">
                     <Icon name="CreditCard" size={14} />
-                    <span>DNI: {selectedClient.dni}</span>
+                    <span>ID: {selectedClient.dni}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Icon name="Mail" size={14} />
@@ -288,17 +291,17 @@ const ClientSelector: React.FC<ClientSelectorProps> = ({
                   </div>
                   <div className="flex items-center space-x-2">
                     <Icon name="Hash" size={14} />
-                    <span>Código: {selectedClient.code}</span>
+                    <span>Code: {selectedClient.code}</span>
                   </div>
                 </div>
-                
+
                 {/* Dirección */}
                 <div className="flex items-start space-x-2 text-sm text-muted-foreground">
                   <Icon name="MapPin" size={14} className="mt-0.5" />
                   <span>{selectedClient.address}</span>
                 </div>
               </div>
-              
+
               {/* Avatar circular */}
               <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
                 <Icon name="User" size={20} color="white" />
@@ -311,12 +314,11 @@ const ClientSelector: React.FC<ClientSelectorProps> = ({
         {/* Solo visible cuando isDropdownOpen es true */}
         {isDropdownOpen && (
           <div className="absolute top-full left-0 right-0 mt-1 bg-(--color-popover) border border-(--color-border) rounded-lg dropdown-shadow z-50 max-h-80 overflow-y-auto">
-            
             {/* Mensaje cuando no hay resultados */}
             {filteredClients.length === 0 ? (
               <div className="p-4 text-center text-(--color-muted-foreground)">
                 <Icon name="Search" size={24} className="mx-auto mb-2" />
-                <p>No se encontraron clientes</p>
+                <p>No clients found</p>
               </div>
             ) : (
               // Lista de clientes filtrados
@@ -340,12 +342,16 @@ const ClientSelector: React.FC<ClientSelectorProps> = ({
                         </div>
                         {/* DNI y email */}
                         <div className="flex items-center space-x-4 text-sm text-(--color-muted-foreground)">
-                          <span>DNI: {client.dni}</span>
+                          <span>ID: {client.dni}</span>
                           <span>{client.email}</span>
                         </div>
                       </div>
                       {/* Icono de flecha */}
-                      <Icon name="ChevronRight" size={16} className="text-(--color-muted-foreground)" />
+                      <Icon
+                        name="ChevronRight"
+                        size={16}
+                        className="text-(--color-muted-foreground)"
+                      />
                     </div>
                   </button>
                 ))}

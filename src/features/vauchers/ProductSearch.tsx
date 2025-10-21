@@ -1,9 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { productsForUI } from "../../utils/testData";
-import type {
-  Price,
-  Product,
-} from "../../types/business.types";
+import type { Price, Product } from "../../types/business.types";
 import { Icon } from "../../components";
 import { Alert, Button, Input } from "antd";
 import { getPrice, getStockInWarehouseSelected } from "../../utils/utils";
@@ -145,7 +142,7 @@ const ProductSearch: React.FC<ProductSearchProps> = ({
         <div className="flex items-center space-x-2">
           <Icon name="Search" size={20} className="text-(--color-primary)" />
           <h3 className="text-lg font-semibold text-foreground">
-            Búsqueda de Productos
+            Product Search
           </h3>
         </div>
         {selectedProduct && (
@@ -153,19 +150,25 @@ const ProductSearch: React.FC<ProductSearchProps> = ({
             onClick={handleClearSelection}
             className="text-sm text-(--color-destructive) hover:text-destructive/80 transition-smooth"
           >
-            Limpiar selección
+            Clear selection
           </button>
         )}
       </div>
+
       {!selectedWarehouse && (
-        <Alert message="Selecciona un almacén primero para buscar productos" showIcon type="warning"/>
+        <Alert
+          message="Select a warehouse first to search products"
+          showIcon
+          type="warning"
+        />
       )}
+
       {selectedWarehouse && (
         <>
           <div className="relative">
             <Input
               type="text"
-              placeholder="Buscar por nombre, SKU o descripción..."
+              placeholder="Search by name, SKU, or description..."
               value={searchTerm}
               onChange={handleSearchChange}
               onFocus={() => setIsDropdownOpen(true)}
@@ -173,7 +176,11 @@ const ProductSearch: React.FC<ProductSearchProps> = ({
               className="pr-10"
             />
             <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-              <Icon name="Search" size={16} className="text-(--color-muted-foreground)" />
+              <Icon
+                name="Search"
+                size={16}
+                className="text-(--color-muted-foreground)"
+              />
             </div>
           </div>
 
@@ -183,7 +190,7 @@ const ProductSearch: React.FC<ProductSearchProps> = ({
               {filteredProducts?.length === 0 ? (
                 <div className="p-4 text-center text-muted-foreground">
                   <Icon name="Package" size={24} className="mx-auto mb-2" />
-                  <p>No se encontraron productos</p>
+                  <p>No products found</p>
                 </div>
               ) : (
                 <div className="py-2">
@@ -234,7 +241,7 @@ const ProductSearch: React.FC<ProductSearchProps> = ({
                               <div
                                 className={`text-xs px-2 py-0.5 rounded ${stockInfo?.bg} ${stockInfo?.color}`}
                               >
-                                {stock} unidades
+                                {stock} units
                               </div>
                             </div>
                           </div>
@@ -282,13 +289,17 @@ const ProductSearch: React.FC<ProductSearchProps> = ({
                       SKU: {selectedProduct?.sku}
                     </span>
                     <div className="flex items-center space-x-2">
-                      <Icon name="Package" size={14} className="text-(--color-success)" />
+                      <Icon
+                        name="Package"
+                        size={14}
+                        className="text-(--color-success)"
+                      />
                       <span className="text-sm text-(--color-success)">
                         {getStockInWarehouseSelected(
                           selectedWarehouse,
                           selectedProduct.warehouseStocks
                         )}{" "}
-                        disponibles
+                        available
                       </span>
                     </div>
                   </div>
@@ -297,7 +308,7 @@ const ProductSearch: React.FC<ProductSearchProps> = ({
 
               <div className="flex items-center space-x-4">
                 <div className="flex-1">
-                  <label htmlFor="quantity">Cantidad</label>
+                  <label htmlFor="quantity">Quantity</label>
                   <Input
                     id="quantity"
                     type="number"
@@ -326,14 +337,14 @@ const ProductSearch: React.FC<ProductSearchProps> = ({
                     icon={<Icon name="Plus" size={16} />}
                     iconPosition="start"
                   >
-                    Agregar
+                    Add
                   </Button>
                 </div>
               </div>
 
               <div className="bg-primary/5 border border-primary/20 rounded-lg p-3">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Total línea:</span>
+                  <span className="text-muted-foreground">Line Total:</span>
                   <span className="font-semibold text-primary">
                     €
                     {(

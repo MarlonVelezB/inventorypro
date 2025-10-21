@@ -56,14 +56,14 @@ const WarehouseSelector: React.FC<WarehouseSelector> = ({
       <div className="flex items-center space-x-2">
         <Icon name="Warehouse" size={20} className="text-(--color-primary)" />
         <h3 className="text-lg font-semibold text-(--color-foreground)">
-          Selección de Almacén
+          Warehouse Selection
         </h3>
       </div>
 
       <div className="flex flex-col gap-y-4">
-        <label>*Almacén de origen</label>
+        <label>*Source Warehouse</label>
         <Select
-          placeholder="Seleccionar almacén..."
+          placeholder="Select warehouse..."
           options={mockWarehouses}
           value={selectedWarehouse}
           onChange={onWarehouseSelect}
@@ -72,7 +72,7 @@ const WarehouseSelector: React.FC<WarehouseSelector> = ({
             (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
           }
         />
-        <p>Selecciona el almacén desde donde se tomarán los productos</p>
+        <p>Select the warehouse from which the products will be taken</p>
       </div>
 
       {/* Selected Warehouse Info */}
@@ -100,9 +100,9 @@ const WarehouseSelector: React.FC<WarehouseSelector> = ({
                   <Icon name="Package" size={14} />
                   <span>
                     {selectedWarehouseData?.totalProducts?.toLocaleString(
-                      "es-ES"
+                      "en-US"
                     )}{" "}
-                    productos disponibles
+                    products available
                   </span>
                 </div>
               </div>
@@ -112,7 +112,7 @@ const WarehouseSelector: React.FC<WarehouseSelector> = ({
       )}
       {!selectedWarehouse && (
         <Alert
-          message="Selecciona un almacén para ver el inventario disponible"
+          message="Select a warehouse to see available inventory"
           type="warning"
           showIcon
         />
