@@ -1,11 +1,13 @@
-import { Button, Input } from "antd";
+import { Button, Input, Image } from "antd";
 import { Icon } from "../../components";
+import { getPrice } from "../../utils/utils";
+import type { ProductImage } from "../../types/business.types";
 
 interface ShoppingCartProps {
-  cartItems: any[],
-  onQuantityChange: (itemId: string | number, newQuantity: number) => void,
-  onRemoveItem: (itemId: string | number) => void,
-  className?: string,
+  cartItems: any[];
+  onQuantityChange: (itemId: string | number, newQuantity: number) => void;
+  onRemoveItem: (itemId: string | number) => void;
+  className?: string;
 }
 
 const ShoppingCart: React.FC<ShoppingCartProps> = ({
@@ -14,7 +16,10 @@ const ShoppingCart: React.FC<ShoppingCartProps> = ({
   onRemoveItem,
   className = "",
 }) => {
-  const handleQuantityChange = (itemId: string | number, newQuantity: string) => {
+  const handleQuantityChange = (
+    itemId: string | number,
+    newQuantity: string
+  ) => {
     const item = cartItems?.find((item) => item?.id === itemId);
     if (!item) return;
 
@@ -44,12 +49,16 @@ const ShoppingCart: React.FC<ShoppingCartProps> = ({
         className={`bg-(--color-card) border border-(--color-border) rounded-lg p-6 ${className}`}
       >
         <div className="flex items-center space-x-2 mb-4">
-          <Icon name="ShoppingCart" size={20} className="text-(--color-primary)" />
+          <Icon
+            name="ShoppingCart"
+            size={20}
+            className="text-(--color-primary)"
+          />
           <h3 className="text-lg font-semibold text-foreground">
-            Carrito de Compras
+            Shopping Cart
           </h3>
           <span className="bg-muted text-muted-foreground text-xs px-2 py-1 rounded-full">
-            0 productos
+            0 products
           </span>
         </div>
 
@@ -59,9 +68,9 @@ const ShoppingCart: React.FC<ShoppingCartProps> = ({
             size={48}
             className="mx-auto text-muted-foreground mb-4"
           />
-          <p className="text-muted-foreground mb-2">El carrito está vacío</p>
+          <p className="text-muted-foreground mb-2">The cart is empty</p>
           <p className="text-sm text-muted-foreground">
-            Busca y agrega productos para crear la pre-factura
+            Search and add products to create the pre-invoice
           </p>
         </div>
       </div>
@@ -69,17 +78,23 @@ const ShoppingCart: React.FC<ShoppingCartProps> = ({
   }
 
   return (
-    <div className={`bg-(--color-card) border border-(--color-border) rounded-lg ${className}`}>
+    <div
+      className={`bg-(--color-card) border border-(--color-border) rounded-lg ${className}`}
+    >
       <div className="p-4 border-b border-(--color-border)">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Icon name="ShoppingCart" size={20} className="text-(--color-primary)" />
+            <Icon
+              name="ShoppingCart"
+              size={20}
+              className="text-(--color-primary)"
+            />
             <h3 className="text-lg font-semibold text-(--color-foreground)">
-              Carrito de Compras
+              Shopping Cart
             </h3>
           </div>
           <span className="bg-[var(--color-primary)]/10 text-(--color-primary) text-sm px-3 py-1 rounded-full">
-            {getTotalItems()} productos
+            {getTotalItems()} products
           </span>
         </div>
       </div>
@@ -90,20 +105,20 @@ const ShoppingCart: React.FC<ShoppingCartProps> = ({
             <table className="w-full">
               <thead>
                 <tr className="border-b border-(--color-border)">
-                  <th className="text-left py-3 text-sm font-medium text-(--color-muted-foreground)">
-                    Producto
+                  <th className="text-left py-3 text-sm font-medium text-(--color-muted-foreground) w-24">
+                    Product
                   </th>
                   <th className="text-center py-3 text-sm font-medium text-(--color-muted-foreground) w-24">
-                    Cantidad
+                    Quantity
                   </th>
                   <th className="text-right py-3 text-sm font-medium text-(--color-muted-foreground) w-24">
-                    Precio
+                    Price
                   </th>
                   <th className="text-right py-3 text-sm font-medium text-(--color-muted-foreground) w-24">
                     Total
                   </th>
                   <th className="text-center py-3 text-sm font-medium text-(--color-muted-foreground) w-16">
-                    Acción
+                    Action
                   </th>
                 </tr>
               </thead>
@@ -115,16 +130,29 @@ const ShoppingCart: React.FC<ShoppingCartProps> = ({
                   >
                     <td className="py-4">
                       <div className="flex items-center space-x-3">
-                        <div className="w-12 h-12 bg-(--color-muted) rounded-lg overflow-hidden">
-                          <img
-                            src={item?.image}
-                            alt={item?.name}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              (e.currentTarget as HTMLImageElement).src = "/assets/images/no_image.png";
-                            }}
-                          />
+                        <div className="w-15 h-12 bg-(--color-muted) rounded-lg overflow-hidden flex items-center justify-center">
+                          <Image.PreviewGroup
+                            items={item?.images.map(
+                              (imagen: ProductImage) => imagen.url
+                            )}
+                          >
+                            <Image
+                              src={
+                                item?.images?.[0]?.url ||
+                                "/assets/images/no_image.png"
+                              }
+                              onError={(e) => {
+                                (e.currentTarget as HTMLImageElement).src =
+                                  "/assets/images/no_image.png";
+                              }}
+                              className="w-full h-full object-cover rounded-lg cursor-pointer"
+                              preview={{
+                                mask: <Icon name="Eye" />,
+                              }}
+                            />
+                          </Image.PreviewGroup>
                         </div>
+
                         <div>
                           <p className="font-medium text-(--color-foreground) text-sm">
                             {item?.name}
@@ -132,9 +160,9 @@ const ShoppingCart: React.FC<ShoppingCartProps> = ({
                           <p className="text-xs text-(--color-muted-foreground)">
                             SKU: {item?.sku}
                           </p>
-                          <p className="text-xs text-(--color-success)">
-                            {item?.availableStock} disponibles
-                          </p>
+                          {/* <p className="text-xs text-(--color-success)">
+                        {item?.availableStock} available
+                      </p> */}
                         </div>
                       </div>
                     </td>
@@ -147,20 +175,21 @@ const ShoppingCart: React.FC<ShoppingCartProps> = ({
                         onChange={(e) =>
                           handleQuantityChange(item?.id, e?.target?.value)
                         }
-                        className="w-16 text-center"
+                        className="w-10 text-center"
                       />
                     </td>
                     <td className="py-4 text-right text-sm font-medium text-(--color-foreground)">
-                      ${item?.price?.toFixed(2)}
+                      {/* ${item?.price?.toFixed(2)} */}$
+                      {getPrice(item?.prices)}
                     </td>
                     <td className="py-4 text-right text-sm font-semibold text-(--color-primary)">
                       ${item?.lineTotal?.toFixed(2)}
                     </td>
                     <td className="py-4 text-center">
                       <Button
-                        variant='outlined'
+                        variant="outlined"
                         onClick={() => onRemoveItem(item?.id)}
-                        icon={<Icon name="Trash2" size={16}/>}
+                        icon={<Icon name="Trash2" size={16} />}
                         className="text-(--color-destructive) hover:text-[var(--color-destructive)]/80"
                       />
                     </td>
@@ -185,7 +214,8 @@ const ShoppingCart: React.FC<ShoppingCartProps> = ({
                     alt={item?.name}
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).src = "/assets/images/no_image.png";
+                      (e.currentTarget as HTMLImageElement).src =
+                        "/assets/images/no_image.png";
                     }}
                   />
                 </div>
@@ -199,13 +229,13 @@ const ShoppingCart: React.FC<ShoppingCartProps> = ({
                         SKU: {item?.sku}
                       </p>
                       <p className="text-xs text-success">
-                        {item?.availableStock} disponibles
+                        {item?.availableStock} available
                       </p>
                     </div>
                     <Button
                       variant="outlined"
                       onClick={() => onRemoveItem(item?.id)}
-                      icon={<Icon name="Trash2" size={16}/>}
+                      icon={<Icon name="Trash2" size={16} />}
                       className="text-destructive hover:text-destructive/80"
                     />
                   </div>
@@ -213,7 +243,7 @@ const ShoppingCart: React.FC<ShoppingCartProps> = ({
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
                       <span className="text-sm text-muted-foreground">
-                        Cantidad:
+                        Quantity:
                       </span>
                       <Input
                         type="number"

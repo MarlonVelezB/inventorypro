@@ -49,7 +49,7 @@ export interface InventoryMovement {
 }
 
 export interface ProductTag {
-  value: string
+  value: string;
 }
 
 export interface Product {
@@ -68,5 +68,63 @@ export interface Product {
   status?: "ACTIVE" | "INACTIVE" | "DISCONTINUED"; // Estados posibles
   tags?: ProductTag[]; // Etiquetas personalizables
   createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface Customer {
+  id?: number;
+  code: string;
+  name: string;
+  lastname: string;
+  email: string;
+  phone: string;
+  dni: string;
+  address: string;
+  status: "pending" | "active" | "inactive"; // puedes ajustar los estados posibles
+  createdAt: string; // ISO date string
+  updatedAt: string; // ISO date string
+}
+
+export interface SellerInfo {
+  id?: string;
+  businessName: string;
+  ruc?: string;
+  address?: string;
+  phone?: string;
+  email?: string;
+}
+
+export interface InvoiceItem {
+  id?: string;
+  productCode?: string;
+  name: string;
+  description?: string;
+  image?: string;
+  quantity: number;
+  unitPrice: number;
+  total: number;
+}
+
+export interface Voucher {
+  id: string; // UUID o número de factura
+  invoiceNumber: string;
+  issueDate: string; // ISO format (YYYY-MM-DD)
+  dueDate?: string; // opcional
+
+  customer: Customer;
+  seller: SellerInfo;
+
+  items: InvoiceItem[];
+
+  subtotal: number;
+  tax: number;
+  discount?: number;
+  total: number;
+
+  paymentStatus: "PENDING" | "PAID" | "CANCELLED";
+  paymentMethod: "01" | "15" | "16" | "17" | "18" | "19" | "20" | "21";
+
+  notes?: string;
+  createdAt: string;
   updatedAt?: string;
 }

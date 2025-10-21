@@ -1,13 +1,14 @@
 import { Outlet } from "react-router-dom";
 import Sidebar from "../components/sidebar/Sidebar";
 import "./styles.css";
-import { BreadcrumbNavigation, Header } from "../components";
+import { BreadcrumbNavigation, Header, NotificationInitializer } from "../components";
 
 const PrivateLayout: React.FC = () => {
   return (
     <div className="layout-container">
       <Sidebar />
       <main className="main-content">
+        <NotificationInitializer/>
         <Header />
         <BreadcrumbNavigation />
         <div className="p-5">

@@ -17,10 +17,29 @@ const InvoiceCalculations: React.FC<InvoiceCalculationsProps> = ({
 }) => {
   const [discountType, setDiscountType] = useState("percentage"); // 'percentage' or 'fixed'
   const [ivaRate, setIvaRate] = useState(15); // Default Spanish IVA rate
+  const [paymentMethod, setPaymentMethod] = useState(null);
+  const [payStatus, setPayStatus] = useState("PENDING");
 
   const ivaOptions = [
     { value: 0, label: "0% - Exento" },
     { value: 15, label: "15% - IVA" },
+  ];
+
+  const paymentsMethod = [
+    { value: "01", label: "SIN UTILIZACION DEL SISTEMA FINANCIERO" },
+    { value: "15", label: "COMPENSACION DE DEUDAS" },
+    { value: "16", label: "TARJETA DE DEBITO" },
+    { value: "17", label: "DINERO ELECTRONICO" },
+    { value: "18", label: "TARJETA PREPAGO" },
+    { value: "19", label: "TARJETA DE CREDITO" },
+    { value: "20", label: "OTROS CON UTILIZACION DEL SISTEMA FINANCIERO" },
+    { value: "21", label: "ENDOSO DE TITULOS" },
+  ];
+
+  const paymentStatusOptions = [
+    { value: "PENDING", label: "PENDIENTE" },
+    { value: "PAID", label: "PAGADO" },
+    { value: "CANCELLED", label: "CANCELADO" },
   ];
 
   const discountTypeOptions = [
@@ -74,7 +93,7 @@ const InvoiceCalculations: React.FC<InvoiceCalculationsProps> = ({
             className="text-(--color-primary)"
           />
           <h3 className="text-lg font-semibold text-foreground">
-            Cálculos de Facturación
+            Billing Calculations
           </h3>
         </div>
       </div>
@@ -89,10 +108,10 @@ const InvoiceCalculations: React.FC<InvoiceCalculationsProps> = ({
 
         {/* Discount Configuration */}
         <div className="space-y-4 border-t border-border pt-4">
-          <h4 className="text-sm font-medium text-foreground">Descuento</h4>
+          <h4 className="text-sm font-medium text-foreground">Discount</h4>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <label htmlFor="discountType">Tipo de descuento</label>
+            <label htmlFor="discountType">Discount Type</label>
             <Select
               id="discountType"
               options={discountTypeOptions}
@@ -100,7 +119,7 @@ const InvoiceCalculations: React.FC<InvoiceCalculationsProps> = ({
               onChange={setDiscountType}
             />
 
-            <label htmlFor="discountValue">{`Descuento ${
+            <label htmlFor="discountValue">{`Discount ${
               discountType === "percentage" ? "(%)" : "($)"
             }`}</label>
             <Input
@@ -117,7 +136,7 @@ const InvoiceCalculations: React.FC<InvoiceCalculationsProps> = ({
 
           {discountAmount > 0 && (
             <div className="flex items-center justify-between py-2 text-sm">
-              <span className="text-muted-foreground">Descuento aplicado:</span>
+              <span className="text-muted-foreground">Applied discount:</span>
               <span className="text-destructive font-medium">
                 -${discountAmount?.toFixed(2)}
               </span>
@@ -125,7 +144,7 @@ const InvoiceCalculations: React.FC<InvoiceCalculationsProps> = ({
           )}
 
           <div className="flex items-center justify-between py-2 border-t border-border">
-            <span className="text-foreground">Subtotal con descuento:</span>
+            <span className="text-foreground">Subtotal after discount:</span>
             <span className="font-medium text-foreground">
               ${subtotalAfterDiscount?.toFixed(2)}
             </span>
@@ -134,10 +153,10 @@ const InvoiceCalculations: React.FC<InvoiceCalculationsProps> = ({
 
         {/* IVA Configuration */}
         <div className="space-y-4 border-t border-border pt-4">
-          <h4 className="text-sm font-medium text-foreground">Impuestos</h4>
+          <h4 className="text-sm font-medium text-foreground">Taxes</h4>
 
           <div className="flex flex-col gap-y-2">
-            <label htmlFor="ivaRate">Tipo de IVA</label>
+            <label htmlFor="ivaRate">VAT Rate</label>
             <Select
               id="ivaRate"
               options={ivaOptions}
@@ -147,10 +166,37 @@ const InvoiceCalculations: React.FC<InvoiceCalculationsProps> = ({
           </div>
 
           <div className="flex items-center justify-between py-2">
-            <span className="text-muted-foreground">IVA ({ivaRate}%):</span>
+            <span className="text-muted-foreground">VAT ({ivaRate}%):</span>
             <span className="font-medium text-foreground">
               ${ivaAmount?.toFixed(2)}
             </span>
+          </div>
+        </div>
+
+        {/* Detalles de pago */}
+        <div className="space-y-4 border-t border-border pt-4">
+          <h4 className="text-sm font-medium text-foreground">
+            Payment Details
+          </h4>
+          <div className="flex flex-col gap-y-2">
+            <label htmlFor="payMethod">Payment Method</label>
+            <Select
+              id="payMethod"
+              options={paymentsMethod}
+              value={paymentMethod}
+              onChange={setPaymentMethod}
+              placeholder="Select a method"
+            />
+          </div>
+          <div className="flex flex-col gap-y-2">
+            <label htmlFor="payStatus">Payment Status</label>
+            <Select
+              id="payStatus"
+              options={paymentStatusOptions}
+              value={payStatus}
+              onChange={setPayStatus}
+              placeholder="Select a method"
+            />
           </div>
         </div>
 
@@ -172,17 +218,13 @@ const InvoiceCalculations: React.FC<InvoiceCalculationsProps> = ({
             <div className="text-2xl font-bold text-primary">
               {cartItems?.length}
             </div>
-            <div className="text-sm text-muted-foreground">
-              Productos únicos
-            </div>
+            <div className="text-sm text-muted-foreground">Unique Products</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-primary">
               {cartItems?.reduce((total, item) => total + item?.quantity, 0)}
             </div>
-            <div className="text-sm text-muted-foreground">
-              Unidades totales
-            </div>
+            <div className="text-sm text-muted-foreground">Total Units</div>
           </div>
         </div>
 
@@ -190,16 +232,16 @@ const InvoiceCalculations: React.FC<InvoiceCalculationsProps> = ({
         {cartItems?.length > 0 && (
           <div className="bg-muted/50 rounded-lg p-4 space-y-2">
             <h5 className="text-sm font-medium text-foreground mb-3">
-              Desglose de cálculos:
+              Calculation Breakdown:
             </h5>
             <div className="space-y-1 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Base imponible:</span>
+                <span className="text-muted-foreground">Taxable Base:</span>
                 <span>${subtotal?.toFixed(2)}</span>
               </div>
               {discountAmount > 0 && (
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Descuento:</span>
+                  <span className="text-muted-foreground">Discount:</span>
                   <span className="text-destructive">
                     -${discountAmount?.toFixed(2)}
                   </span>
@@ -207,16 +249,16 @@ const InvoiceCalculations: React.FC<InvoiceCalculationsProps> = ({
               )}
               <div className="flex justify-between">
                 <span className="text-muted-foreground">
-                  Base después descuento:
+                  Base after discount:
                 </span>
                 <span>${subtotalAfterDiscount?.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">IVA ({ivaRate}%):</span>
+                <span className="text-muted-foreground">VAT ({ivaRate}%):</span>
                 <span>${ivaAmount?.toFixed(2)}</span>
               </div>
               <div className="flex justify-between font-medium border-t border-border pt-1">
-                <span>Total a pagar:</span>
+                <span>Total to pay:</span>
                 <span className="text-primary">${total?.toFixed(2)}</span>
               </div>
             </div>

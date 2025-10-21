@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from "react";
-import { HeaderSection, InfoCard, ModalConfirmation } from "../components";
+import { HeaderSection, Icon, InfoCard } from "../components";
 import type { InfoCardProps } from "../components/InfoCard";
 import {
   ClientSelector,
@@ -10,7 +10,8 @@ import {
 } from "../features/vauchers";
 import type { Product } from "../types/business.types";
 import { getPrice, getStockInWarehouseSelected } from "../utils/utils";
-import useModalStore from "../store/ModalStore";
+import { confirmService } from "../service/ConfirmService";
+import { Button } from "antd";
 
 const PreInvoiceGenerator = () => {
   const [selectedClient, setSelectedClient] = useState(false);
@@ -20,7 +21,6 @@ const PreInvoiceGenerator = () => {
   const [cartItems, setCartItems] = useState<any[]>([]);
   const [discount, setDiscount] = useState(0);
   const prevWarehouseRef = useRef<string | null>(null);
-  const { openModal } = useModalStore();
 
   const cartStats = useMemo(() => {
     const productsCount = cartItems.length;
@@ -78,15 +78,28 @@ const PreInvoiceGenerator = () => {
     setSelectedClient(client);
   };
 
-  const handleWarehouseSelect = (warehouseValue: any) => {
+  const handleWarehouseSelect = async (warehouseValue: any) => {
     setSelectedWarehouse(warehouseValue);
     // Clear cart when warehouse changes to avoid inventory conflicts
     if (cartItems?.length > 0) {
-         prevWarehouseRef.current = selectedWarehouse;
-        openModal();
+      prevWarehouseRef.current = selectedWarehouse;
+      const confirmed = await confirmService.danger(
+        "Change Warehouse",
+        "Changing the warehouse will clear all items from your cart. Do you want to continue?",
+        {
+          confirmText: "Yes, delete",
+          cancelText: "Cancel",
+        }
+      );
+
+      if (confirmed) {
+        // Usuario confirmó
+        setCartItems([]);
+      } else {
+        setSelectedWarehouse(prevWarehouseRef.current);
+      }
     }
   };
-
 
   const handleProductAdd = (product: Product) => {
     const existingItemIndex = cartItems?.findIndex(
@@ -134,7 +147,7 @@ const PreInvoiceGenerator = () => {
           ? {
               ...item,
               quantity: newQuantity,
-              lineTotal: item?.price * newQuantity,
+              lineTotal: getPrice(item?.prices) * newQuantity,
             }
           : item
       )
@@ -153,10 +166,16 @@ const PreInvoiceGenerator = () => {
 
   return (
     <div className="space-y-6">
-      <HeaderSection
-        title="Pre-Invoice Generator"
-        sectionDescription="Easily create pre-invoices with real-time inventory integration and smart validation."
-      />
+      <div className="flex justify-between">
+        <HeaderSection
+          title="Pre-Invoice Generator"
+          sectionDescription="Easily create pre-invoices with real-time inventory integration and smart validation."
+        />
+        <div className="flex gap-3">
+          <Button icon={<Icon name="Save" size={20} />} aria-label="Save">Save</Button>
+          <Button icon={<Icon name="Eye" size={20} />} aria-label="Preview">Preview</Button>
+        </div>
+      </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -213,15 +232,6 @@ const PreInvoiceGenerator = () => {
           />
         </div>
       </div>
-      <ModalConfirmation
-        title="Change Warehouse"
-        message="Changing the warehouse will clear all items from your cart. Do you want to continue?"
-        type="warning"
-        acceptText="Yes, change"
-        cancelText="Cancel"
-        onAccept={() => setCartItems([])}
-        onCancel={() => {setSelectedWarehouse(prevWarehouseRef.current)}}
-      />
     </div>
   );
 };

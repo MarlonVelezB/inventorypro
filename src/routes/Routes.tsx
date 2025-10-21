@@ -12,6 +12,7 @@ import {
 } from "../pages";
 import PrivateLayout from "./PrivateLayout";
 import PrivateRoute from "./PrivateRoute";
+import PreInvoicePage from "../pages/PreInvoicePage";
 
 const Routes: React.FC = () => {
   return (
@@ -24,7 +25,11 @@ const Routes: React.FC = () => {
           <Route element={<PrivateRoute element={<PrivateLayout />} />}>
             <Route path="/" element={<Dashboard />} />
             <Route
-              path="/pre-invoice-generator"
+              path="/voucher/pre-invoice"
+              element={<PreInvoicePage />}
+            />
+            <Route
+              path="/voucher/pre-invoice-generator"
               element={<PreInvoiceGenerator />}
             />
             <Route path="/product-management" element={<ProductManagement />} />

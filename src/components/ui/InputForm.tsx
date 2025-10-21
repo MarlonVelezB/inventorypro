@@ -1,10 +1,10 @@
 import React, { useMemo, useState } from 'react';
 import Icon from '../AppIcon';
 
-type InputType = 'text' | 'password' | 'textarea' | 'number';
+type InputType = 'text' | 'password' | 'textarea' | 'number' | 'email' | 'tel';
 
 interface InputFormProps {
-  errors: any;
+  errors?: any;
   type: InputType;
   keyName: string;
   placeholder?: string;

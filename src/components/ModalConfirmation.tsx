@@ -1,41 +1,13 @@
+// components/ModalConfirmation.tsx
 import { Modal } from "antd";
 import { AlertTriangle, CheckCircle, Info, XCircle } from "lucide-react";
-import useModalStore from "../store/ModalStore";
+import { useConfirmStore } from "../store/ConfirmStore";
 
-interface ModalConfirmationProps {
-  title: string;
-  message: string;
-  onAccept: () => void;
-  onCancel: () => void;
-  type?: "warning" | "danger" | "success" | "info";
-  acceptText?: string;
-  cancelText?: string;
-  loading?: boolean;
-}
+const ModalConfirmation: React.FC = () => {
+  const { isOpen, options, confirm, cancel } = useConfirmStore();
 
-const ModalConfirmation: React.FC<ModalConfirmationProps> = ({
-  title,
-  message,
-  onAccept,
-  onCancel,
-  type = "warning",
-  acceptText = "Confirm",
-  cancelText = "Cancel",
-  loading = false,
-}) => {
-  const { showModal, closeModal } = useModalStore();
+  if (!options) return null;
 
-  const handleOk = () => {
-    closeModal();
-    onAccept();
-  };
-
-  const handleCancel = () => {
-    closeModal();
-    onCancel();
-  };
-
-  // Configuración de iconos y colores según el tipo
   const typeConfig = {
     warning: {
       icon: AlertTriangle,
@@ -67,21 +39,21 @@ const ModalConfirmation: React.FC<ModalConfirmationProps> = ({
     },
   };
 
-  const config = typeConfig[type];
+  const config = typeConfig[options.type || "warning"];
   const IconComponent = config.icon;
 
   return (
     <Modal
-      open={showModal}
-      onCancel={handleCancel}
+      open={isOpen}
+      onCancel={cancel}
       footer={null}
       centered
       closeIcon={null}
       width={440}
       className="modal-confirmation"
+      maskClosable={false}
     >
       <div className="p-6">
-        {/* Icon Header */}
         <div className="flex items-center justify-center mb-4">
           <div
             className={`w-16 h-16 rounded-full flex items-center justify-center ${config.bgColor} ${config.borderColor} border-2`}
@@ -90,57 +62,28 @@ const ModalConfirmation: React.FC<ModalConfirmationProps> = ({
           </div>
         </div>
 
-        {/* Title */}
         <h3 className="text-xl font-semibold text-center text-gray-900 mb-3">
-          {title}
+          {options.title}
         </h3>
 
-        {/* Message */}
         <p className="text-center text-gray-600 mb-6 leading-relaxed">
-          {message}
+          {options.message}
         </p>
 
-        {/* Action Buttons */}
         <div className="flex gap-3">
+          {(options.showCancelButton ?? true) && (
+            <button
+              onClick={cancel}
+              className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+            >
+              {options.cancelText || "Cancel"}
+            </button>
+          )}
           <button
-            onClick={handleCancel}
-            disabled={loading}
-            className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={confirm}
+            className={`flex-1 px-4 py-2.5 rounded-lg text-white font-medium transition-colors ${config.buttonColor}`}
           >
-            {cancelText}
-          </button>
-          <button
-            onClick={handleOk}
-            disabled={loading}
-            className={`flex-1 px-4 py-2.5 rounded-lg text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${config.buttonColor}`}
-          >
-            {loading ? (
-              <span className="flex items-center justify-center gap-2">
-                <svg
-                  className="animate-spin h-4 w-4 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-                Processing...
-              </span>
-            ) : (
-              acceptText
-            )}
+            {options.confirmText || "Confirm"}
           </button>
         </div>
       </div>

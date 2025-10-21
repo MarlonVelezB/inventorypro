@@ -8,7 +8,9 @@ const BreadcrumbNavigation = () => {
     switch (path) {
       case "/product-management":
         return "Product Management";
-      case "/pre-invoice-generator":
+      case "/voucher/pre-invoice":
+        return "Pre-Invoice";
+      case "/voucher/pre-invoice-generator":
         return "Pre-Invoice Generator";
       case "/client-management":
         return "Client Management";
