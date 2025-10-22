@@ -8,18 +8,29 @@ import {
   ShoppingCart,
   WarehouseSelector,
 } from "../features/vauchers";
-import type { Product } from "../types/business.types";
+import type {
+  PaymentMethodCode,
+  VoucherItem,
+  WarehouseStock,
+} from "../types/business.types";
 import { getPrice, getStockInWarehouseSelected } from "../utils/utils";
 import { confirmService } from "../service/ConfirmService";
 import { Button } from "antd";
+import useVoucherGeneratorStore from "../store/VoucherGeneratorStore";
 
-const PreInvoiceGenerator = () => {
+const PreInvoiceGenerator: React.FC = () => {
   const [selectedClient, setSelectedClient] = useState(false);
   const [selectedWarehouse, setSelectedWarehouse] = useState<string | null>(
     null
   );
   const [cartItems, setCartItems] = useState<any[]>([]);
   const [discount, setDiscount] = useState(0);
+  const [paymentMethodSelect, setPaymentMethodSelect] =
+    useState<PaymentMethodCode | null>(null);
+
+  const { voucher, setVoucher, calculateTotals, updateItems, resetVoucher } =
+    useVoucherGeneratorStore();
+
   const prevWarehouseRef = useRef<string | null>(null);
 
   const cartStats = useMemo(() => {
@@ -76,6 +87,7 @@ const PreInvoiceGenerator = () => {
 
   const handleClientSelect = (client: any) => {
     setSelectedClient(client);
+    setVoucher({ ...voucher, customer: { ...client } });
   };
 
   const handleWarehouseSelect = async (warehouseValue: any) => {
@@ -101,7 +113,10 @@ const PreInvoiceGenerator = () => {
     }
   };
 
-  const handleProductAdd = (product: Product) => {
+  const handleProductAdd = (
+    product: VoucherItem,
+    warehouseStocks: Record<string, WarehouseStock>
+  ) => {
     const existingItemIndex = cartItems?.findIndex(
       (item) => item?.id === product?.id
     );
@@ -114,7 +129,7 @@ const PreInvoiceGenerator = () => {
 
       const availableStock = getStockInWarehouseSelected(
         selectedWarehouse,
-        product.warehouseStocks
+        warehouseStocks
       );
       const price = getPrice(updatedItems?.[existingItemIndex].prices);
 
@@ -130,9 +145,9 @@ const PreInvoiceGenerator = () => {
         quantity: newQuantity,
         lineTotal: price * newQuantity,
       };
+
       setCartItems(updatedItems);
     } else {
-      // Add new item
       setCartItems((prevItems) => [...prevItems, product]);
     }
   };
@@ -152,6 +167,8 @@ const PreInvoiceGenerator = () => {
           : item
       )
     );
+    updateItems(cartItems);
+    calculateTotals();
   };
 
   const handleRemoveItem = (itemId: string | number) => {
@@ -164,6 +181,19 @@ const PreInvoiceGenerator = () => {
     setDiscount(newDiscount);
   };
 
+  const handleIvaRateChange = (newIvaRate: number) => {
+    calculateTotals();
+  };
+
+  const handlePaymentMethodChange = (paymentMethod: PaymentMethodCode) => {
+    setPaymentMethodSelect(paymentMethod);
+  };
+
+  const handleSaveVoucher = () => {
+    console.log("VOUCHER: ", voucher);
+    //resetVoucher();
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between">
@@ -172,8 +202,23 @@ const PreInvoiceGenerator = () => {
           sectionDescription="Easily create pre-invoices with real-time inventory integration and smart validation."
         />
         <div className="flex gap-3">
-          <Button icon={<Icon name="Save" size={20} />} aria-label="Save">Save</Button>
-          <Button icon={<Icon name="Eye" size={20} />} aria-label="Preview">Preview</Button>
+          <Button
+            disabled={
+              voucher.items.length === 0 || paymentMethodSelect === null
+            }
+            icon={<Icon name="Save" size={20} />}
+            aria-label="Save"
+            onClick={handleSaveVoucher}
+          >
+            Save
+          </Button>
+          <Button
+            disabled={voucher.items.length === 0}
+            icon={<Icon name="Eye" size={20} />}
+            aria-label="Preview"
+          >
+            Preview
+          </Button>
         </div>
       </div>
 
@@ -229,6 +274,8 @@ const PreInvoiceGenerator = () => {
             cartItems={cartItems}
             discount={discount}
             onDiscountChange={handleDiscountChange}
+            onPaymentMethodChange={handlePaymentMethodChange}
+            onIVAChange={handleIvaRateChange}
           />
         </div>
       </div>

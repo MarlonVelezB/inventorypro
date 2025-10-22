@@ -1,7 +1,5 @@
-import { Button, Input, Image } from "antd";
+import { Button, Input, Image, Tooltip } from "antd";
 import { Icon } from "../../components";
-import { getPrice } from "../../utils/utils";
-import type { ProductImage } from "../../types/business.types";
 
 interface ShoppingCartProps {
   cartItems: any[];
@@ -16,6 +14,7 @@ const ShoppingCart: React.FC<ShoppingCartProps> = ({
   onRemoveItem,
   className = "",
 }) => {
+
   const handleQuantityChange = (
     itemId: string | number,
     newQuantity: string
@@ -129,18 +128,11 @@ const ShoppingCart: React.FC<ShoppingCartProps> = ({
                     className="border-b border-(--color-border) last:border-b-0"
                   >
                     <td className="py-4">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-15 h-12 bg-(--color-muted) rounded-lg overflow-hidden flex items-center justify-center">
-                          <Image.PreviewGroup
-                            items={item?.images.map(
-                              (imagen: ProductImage) => imagen.url
-                            )}
-                          >
+                      <Tooltip title={item.description}>
+                        <div className="flex items-center space-x-3">
+                          <div className="w-15 h-12 bg-(--color-muted) rounded-lg overflow-hidden flex items-center justify-center">
                             <Image
-                              src={
-                                item?.images?.[0]?.url ||
-                                "/assets/images/no_image.png"
-                              }
+                              src={item?.image || "/assets/images/no_image.png"}
                               onError={(e) => {
                                 (e.currentTarget as HTMLImageElement).src =
                                   "/assets/images/no_image.png";
@@ -150,21 +142,18 @@ const ShoppingCart: React.FC<ShoppingCartProps> = ({
                                 mask: <Icon name="Eye" />,
                               }}
                             />
-                          </Image.PreviewGroup>
-                        </div>
+                          </div>
 
-                        <div>
-                          <p className="font-medium text-(--color-foreground) text-sm">
-                            {item?.name}
-                          </p>
-                          <p className="text-xs text-(--color-muted-foreground)">
-                            SKU: {item?.sku}
-                          </p>
-                          {/* <p className="text-xs text-(--color-success)">
-                        {item?.availableStock} available
-                      </p> */}
+                          <div>
+                            <p className="font-medium text-(--color-foreground) text-sm">
+                              {item?.name}
+                            </p>
+                            <p className="text-xs text-(--color-muted-foreground)">
+                              SKU: {item?.productCode}
+                            </p>
+                          </div>
                         </div>
-                      </div>
+                      </Tooltip>
                     </td>
                     <td className="py-4 text-center">
                       <Input
@@ -180,7 +169,7 @@ const ShoppingCart: React.FC<ShoppingCartProps> = ({
                     </td>
                     <td className="py-4 text-right text-sm font-medium text-(--color-foreground)">
                       {/* ${item?.price?.toFixed(2)} */}$
-                      {getPrice(item?.prices)}
+                      {item.unitPrice}
                     </td>
                     <td className="py-4 text-right text-sm font-semibold text-(--color-primary)">
                       ${item?.lineTotal?.toFixed(2)}

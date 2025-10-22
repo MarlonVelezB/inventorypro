@@ -1,13 +1,14 @@
 import { useState, useRef, useEffect } from "react";
 import { productsForUI } from "../../utils/testData";
-import type { Price, Product } from "../../types/business.types";
+import type { Price, Product, VoucherItem, WarehouseStock } from "../../types/business.types";
 import { Icon } from "../../components";
 import { Alert, Button, Input } from "antd";
 import { getPrice, getStockInWarehouseSelected } from "../../utils/utils";
+import useVoucherGeneratorStore from "../../store/VoucherGeneratorStore";
 
 interface ProductSearchProps {
   selectedWarehouse: string | null;
-  onProductAdd: (product: Product) => void;
+  onProductAdd: (product: VoucherItem, warehouseStocks: Record<string, WarehouseStock>) => void;
   className: string;
 }
 
@@ -23,6 +24,7 @@ const ProductSearch: React.FC<ProductSearchProps> = ({
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [quantity, setQuantity] = useState(1);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const { voucher, updateItems } = useVoucherGeneratorStore();
 
   useEffect(() => {
     const handleClickOutside = (event: any) => {
@@ -92,14 +94,19 @@ const ProductSearch: React.FC<ProductSearchProps> = ({
     // Ensure amount is a number (fallback to 0) before calculating line total
     const unitAmount = price?.amount ?? 0;
 
-    const productToAdd = {
-      ...selectedProduct,
+    const itemVoucher: VoucherItem = {
+      id: selectedProduct.id,
+      productCode: selectedProduct.sku,
+      name: selectedProduct.name,
+      description: selectedProduct.description,
+      image: selectedProduct.images ? selectedProduct.images[0].url : "",
       quantity: quantity,
-      availableStock,
+      unitPrice: unitAmount,
       lineTotal: unitAmount * quantity,
     };
+    updateItems([...voucher.items, itemVoucher]);
 
-    onProductAdd(productToAdd);
+    onProductAdd(itemVoucher, selectedProduct.warehouseStocks ?? {});
 
     // Reset form
     setSelectedProduct(null);

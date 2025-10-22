@@ -3,8 +3,9 @@ import { useState } from "react";
 import type { Voucher } from "../../types/business.types";
 import type { TableRowSelection } from "antd/es/table/interface";
 import type { ResizeCallbackData } from "react-resizable";
-import { mockPreInvoices } from "../../utils/testData";
 import { Icon, ResizableTitle } from "../../components";
+import { useVoucherStore } from "../../store/VoucherStore";
+import { getPaymentMethodLabel } from "../../utils/utils";
 
 interface PreInvoiceTableProps {
   onEditRow: (row: Voucher) => void;
@@ -13,7 +14,11 @@ interface PreInvoiceTableProps {
   onDeleteRowSelected?: () => void;
 }
 
-const PreInvoiceTable: React.FC<PreInvoiceTableProps> = ({onEditRow, onDeleteRow, onViewRow}) => {
+const PreInvoiceTable: React.FC<PreInvoiceTableProps> = ({
+  onEditRow,
+  onDeleteRow,
+  onViewRow,
+}) => {
   const [columns, setColumns] = useState<TableColumnsType<Voucher>>([
     {
       title: "Invoice #",
@@ -30,13 +35,21 @@ const PreInvoiceTable: React.FC<PreInvoiceTableProps> = ({onEditRow, onDeleteRow
       title: "Customer",
       dataIndex: ["customer", "name"],
       width: 180,
-      render: (_, record) =>
-        `${record.customer.name} ${record.customer.lastname}`,
-    },
-    {
-      title: "Email",
-      dataIndex: ["customer", "email"],
-      width: 200,
+      render: (_, record) => (
+        <div className="flex flex-col gap-y-2">
+          <span className="text-md font-bold">{`${record.customer.name} ${record.customer.lastname}`}</span>
+          <div className="flex flex-col">
+            <small className="text-(--color-muted-foreground) flex items-center gap-1">
+              <Icon name="Phone" size={12} />
+              {record.customer.phone}
+            </small>
+            <small className="text-(--color-muted-foreground) flex items-center gap-1">
+              <Icon name="Mail" size={12} />
+              {record.customer.email}
+            </small>
+          </div>
+        </div>
+      ),
     },
     {
       title: "Total",
@@ -48,7 +61,8 @@ const PreInvoiceTable: React.FC<PreInvoiceTableProps> = ({onEditRow, onDeleteRow
       title: "Payment Method",
       dataIndex: "paymentMethod",
       width: 160,
-      render: (method: Voucher["paymentMethod"]) => method || "—",
+      render: (method: Voucher["paymentMethod"]) =>
+        getPaymentMethodLabel(method) || "—",
     },
     {
       title: "Status",
@@ -97,13 +111,14 @@ const PreInvoiceTable: React.FC<PreInvoiceTableProps> = ({onEditRow, onDeleteRow
       ),
     },
   ]);
+  const { vouchers, filteredVouchers, selectedVouchers } = useVoucherStore();
 
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
     console.log("selectedRowKeys changed: ", newSelectedRowKeys);
   };
 
   const rowSelection: TableRowSelection<Voucher> = {
-    selectedRowKeys: [],
+    selectedRowKeys: selectedVouchers,
     onChange: onSelectChange,
   };
 
@@ -133,7 +148,9 @@ const PreInvoiceTable: React.FC<PreInvoiceTableProps> = ({onEditRow, onDeleteRow
           rowKey="id"
           rowSelection={rowSelection}
           columns={mergedColumns}
-          dataSource={mockPreInvoices}
+          dataSource={
+            filteredVouchers.length === 0 ? vouchers : filteredVouchers
+          }
           components={{
             header: {
               cell: ResizableTitle,

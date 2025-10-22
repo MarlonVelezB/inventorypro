@@ -72,7 +72,7 @@ export interface Product {
 }
 
 export interface Customer {
-  id?: number;
+  id?: string | number;
   code: string;
   name: string;
   lastname: string;
@@ -94,35 +94,47 @@ export interface SellerInfo {
   email?: string;
 }
 
-export interface InvoiceItem {
+export interface VoucherItem {
   id?: string;
-  productCode?: string;
+  productCode: string;
   name: string;
   description?: string;
   image?: string;
   quantity: number;
   unitPrice: number;
-  total: number;
+  lineTotal: number;
 }
 
+export type PaymentMethodCode = "01" | "15" | "16" | "17" | "18" | "19" | "20" | "21";
+export interface PaymentMethod {
+  code: PaymentMethodCode;
+  label: string;
+};
+
+export type PaymentStatus =  "PENDING" | "PAID" | "CANCELLED";
+export type DiscountType = "percentage" | "fixed";
+
 export interface Voucher {
-  id: string; // UUID o número de factura
+  id?: string; // UUID o número de factura
   invoiceNumber: string;
-  issueDate: string; // ISO format (YYYY-MM-DD)
-  dueDate?: string; // opcional
+  issueDate: string; // Fecha de emisión de la factura ISO format (YYYY-MM-DD)
+  dueDate?: string; // Fecha de vencimiento del pago (opcional)
 
   customer: Customer;
   seller: SellerInfo;
 
-  items: InvoiceItem[];
+  items: VoucherItem[];
 
-  subtotal: number;
-  tax: number;
+  subtotalBeforeDiscount: number;
+  subtotalAffterDiscount: number;
+  taxRate: number;
+  taxAmount: number;
   discount?: number;
+  discountType?: DiscountType;
   total: number;
 
-  paymentStatus: "PENDING" | "PAID" | "CANCELLED";
-  paymentMethod: "01" | "15" | "16" | "17" | "18" | "19" | "20" | "21";
+  paymentStatus: PaymentStatus;
+  paymentMethod: PaymentMethodCode;
 
   notes?: string;
   createdAt: string;
