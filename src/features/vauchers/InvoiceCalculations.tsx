@@ -1,11 +1,26 @@
-import { useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Icon } from "../../components";
 import { Input, Select } from "antd";
+import useVoucherGeneratorStore from "../../store/VoucherGeneratorStore";
+import type {
+  DiscountType,
+  PaymentMethod,
+  PaymentMethodCode,
+  PaymentStatus,
+} from "../../types/business.types";
+import {
+  discountTypes,
+  mockPaymentsMethod,
+  mockPayStatus,
+  taxesTypes,
+} from "../../utils/testData";
 
 interface InvoiceCalculationsProps {
   cartItems: any[];
   discount: number | any;
   onDiscountChange: (discount: number) => void;
+  onIVAChange: (iva: number) => void;
+  onPaymentMethodChange: (value: PaymentMethodCode) => void;
   className?: string;
 }
 
@@ -13,72 +28,122 @@ const InvoiceCalculations: React.FC<InvoiceCalculationsProps> = ({
   cartItems,
   discount,
   onDiscountChange,
+  onIVAChange,
+  onPaymentMethodChange,
   className = "",
 }) => {
-  const [discountType, setDiscountType] = useState("percentage"); // 'percentage' or 'fixed'
-  const [ivaRate, setIvaRate] = useState(15); // Default Spanish IVA rate
-  const [paymentMethod, setPaymentMethod] = useState(null);
-  const [payStatus, setPayStatus] = useState("PENDING");
+  const [discountType, setDiscountType] = useState<DiscountType>("percentage");
+  const [ivaRate, setIvaRate] = useState(15);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethodCode | null>(
+    null
+  );
+  const [payStatus, setPayStatus] = useState<PaymentStatus>("PENDING");
+  const { voucher, setVoucher, calculateTotals } = useVoucherGeneratorStore();
 
-  const ivaOptions = [
-    { value: 0, label: "0% - Exento" },
-    { value: 15, label: "15% - IVA" },
-  ];
+  useEffect(() => {
+    setVoucher({
+      ...voucher,
+      discount: discount,
+      discountType: discountType,
+    });
+    calculateTotals();
+  }, [discount, discountType]);
 
-  const paymentsMethod = [
-    { value: "01", label: "SIN UTILIZACION DEL SISTEMA FINANCIERO" },
-    { value: "15", label: "COMPENSACION DE DEUDAS" },
-    { value: "16", label: "TARJETA DE DEBITO" },
-    { value: "17", label: "DINERO ELECTRONICO" },
-    { value: "18", label: "TARJETA PREPAGO" },
-    { value: "19", label: "TARJETA DE CREDITO" },
-    { value: "20", label: "OTROS CON UTILIZACION DEL SISTEMA FINANCIERO" },
-    { value: "21", label: "ENDOSO DE TITULOS" },
-  ];
-
-  const paymentStatusOptions = [
-    { value: "PENDING", label: "PENDIENTE" },
-    { value: "PAID", label: "PAGADO" },
-    { value: "CANCELLED", label: "CANCELADO" },
-  ];
-
-  const discountTypeOptions = [
-    { value: "percentage", label: "Porcentaje (%)" },
-    { value: "fixed", label: "Cantidad fija ($)" },
-  ];
-
-  // Calculate subtotal
-  const subtotal = cartItems?.reduce(
-    (total, item) => total + item?.lineTotal,
-    0
+  const paymentsMethod = mockPaymentsMethod.map(
+    (paymentMethod: PaymentMethod) => {
+      return { ...paymentMethod, value: paymentMethod.code };
+    }
   );
 
-  // Calculate discount amount
-  const getDiscountAmount = () => {
-    if (!discount || discount <= 0) return 0;
+  const paymentStatusOptions = mockPayStatus;
+  const discountTypeOptions = discountTypes;
+  const ivaOptions = taxesTypes;
 
-    if (discountType === "percentage") {
-      return (subtotal * discount) / 100;
-    } else {
-      return Math.min(discount, subtotal); // Don't allow discount greater than subtotal
+  // Cálculos memoizados para evitar recalcular en cada render
+  const calculations = useMemo(() => {
+    // Subtotal: suma de todos los lineTotal
+    const subtotal =
+      cartItems?.reduce((total, item) => total + (item?.lineTotal || 0), 0) ||
+      0;
+
+    // Calcular descuento aplicado
+    let discountAmount = 0;
+    const discountValue = parseFloat(discount) || 0;
+
+    if (discountValue > 0) {
+      if (discountType === "percentage") {
+        // Descuento porcentual: no puede exceder 100%
+        const validPercentage = Math.min(Math.max(discountValue, 0), 100);
+        discountAmount = (subtotal * validPercentage) / 100;
+      } else {
+        // Descuento fijo: no puede exceder el subtotal
+        discountAmount = Math.min(Math.max(discountValue, 0), subtotal);
+      }
     }
-  };
 
-  const discountAmount = getDiscountAmount();
-  const subtotalAfterDiscount = subtotal - discountAmount;
-  const ivaAmount = (subtotalAfterDiscount * ivaRate) / 100;
-  const total = subtotalAfterDiscount + ivaAmount;
+    // Subtotal después del descuento
+    const subtotalAfterDiscount = subtotal - discountAmount;
+
+    // Calcular IVA sobre el subtotal después del descuento
+    const ivaAmount = (subtotalAfterDiscount * ivaRate) / 100;
+
+    // Total final
+    const total = subtotalAfterDiscount + ivaAmount;
+
+    // Cantidades totales
+    const uniqueProducts = cartItems?.length || 0;
+    const totalUnits =
+      cartItems?.reduce((total, item) => total + (item?.quantity || 0), 0) || 0;
+
+    return {
+      subtotal,
+      discountAmount,
+      subtotalAfterDiscount,
+      ivaAmount,
+      total,
+      uniqueProducts,
+      totalUnits,
+    };
+  }, [cartItems, discount, discountType, ivaRate]);
+
+  const handleIvaRateChange = (value: number) => {
+    onIVAChange(value);
+    setIvaRate(value);
+  };
 
   const handleDiscountChange = (value: string) => {
     const numValue = parseFloat(value) || 0;
 
-    if (discountType === "percentage" && numValue > 100) {
-      onDiscountChange(100);
-    } else if (discountType === "fixed" && numValue > subtotal) {
-      onDiscountChange(subtotal);
+    // Validar según el tipo de descuento
+    if (discountType === "percentage") {
+      const validValue = Math.min(Math.max(numValue, 0), 100);
+      onDiscountChange(validValue);
     } else {
-      onDiscountChange(numValue);
+      const validValue = Math.min(Math.max(numValue, 0), calculations.subtotal);
+      onDiscountChange(validValue);
     }
+  };
+
+  const handleDiscountTypeChange = (value: DiscountType) => {
+    setDiscountType(value);
+    // Resetear descuento al cambiar tipo para evitar valores inválidos
+    onDiscountChange(0);
+  };
+
+  const handlePayMethodChange = (value: PaymentMethodCode) => {
+    setPaymentMethod(value);
+    setVoucher({ ...voucher, paymentMethod: value });
+    onPaymentMethodChange(value);
+  };
+
+  const handlePayStatusChange = (value: PaymentStatus) => {
+    setPayStatus(value);
+    setVoucher({ ...voucher, paymentStatus: value });
+  };
+
+  // Función para formatear números con 2 decimales
+  const formatCurrency = (value: number): string => {
+    return value.toFixed(2);
   };
 
   return (
@@ -102,7 +167,7 @@ const InvoiceCalculations: React.FC<InvoiceCalculationsProps> = ({
         <div className="flex items-center justify-between py-2">
           <span className="text-foreground">Subtotal:</span>
           <span className="text-lg font-medium text-foreground">
-            ${subtotal?.toFixed(2)}
+            ${formatCurrency(calculations.subtotal)}
           </span>
         </div>
 
@@ -116,7 +181,7 @@ const InvoiceCalculations: React.FC<InvoiceCalculationsProps> = ({
               id="discountType"
               options={discountTypeOptions}
               value={discountType}
-              onChange={setDiscountType}
+              onChange={handleDiscountTypeChange}
             />
 
             <label htmlFor="discountValue">{`Discount ${
@@ -126,7 +191,7 @@ const InvoiceCalculations: React.FC<InvoiceCalculationsProps> = ({
               id="discountValue"
               type="number"
               min="0"
-              max={discountType === "percentage" ? 100 : subtotal}
+              max={discountType === "percentage" ? 100 : calculations.subtotal}
               step={discountType === "percentage" ? 0.1 : 0.01}
               value={discount || ""}
               onChange={(e) => handleDiscountChange(e?.target?.value)}
@@ -134,11 +199,11 @@ const InvoiceCalculations: React.FC<InvoiceCalculationsProps> = ({
             />
           </div>
 
-          {discountAmount > 0 && (
+          {calculations.discountAmount > 0 && (
             <div className="flex items-center justify-between py-2 text-sm">
               <span className="text-muted-foreground">Applied discount:</span>
               <span className="text-destructive font-medium">
-                -${discountAmount?.toFixed(2)}
+                -${formatCurrency(calculations.discountAmount)}
               </span>
             </div>
           )}
@@ -146,7 +211,7 @@ const InvoiceCalculations: React.FC<InvoiceCalculationsProps> = ({
           <div className="flex items-center justify-between py-2 border-t border-border">
             <span className="text-foreground">Subtotal after discount:</span>
             <span className="font-medium text-foreground">
-              ${subtotalAfterDiscount?.toFixed(2)}
+              ${formatCurrency(calculations.subtotalAfterDiscount)}
             </span>
           </div>
         </div>
@@ -161,14 +226,14 @@ const InvoiceCalculations: React.FC<InvoiceCalculationsProps> = ({
               id="ivaRate"
               options={ivaOptions}
               value={ivaRate}
-              onChange={setIvaRate}
+              onChange={(value) => handleIvaRateChange(value)}
             />
           </div>
 
           <div className="flex items-center justify-between py-2">
             <span className="text-muted-foreground">VAT ({ivaRate}%):</span>
             <span className="font-medium text-foreground">
-              ${ivaAmount?.toFixed(2)}
+              ${formatCurrency(calculations.ivaAmount)}
             </span>
           </div>
         </div>
@@ -179,12 +244,12 @@ const InvoiceCalculations: React.FC<InvoiceCalculationsProps> = ({
             Payment Details
           </h4>
           <div className="flex flex-col gap-y-2">
-            <label htmlFor="payMethod">Payment Method</label>
+            <label htmlFor="payMethod">*Payment Method</label>
             <Select
               id="payMethod"
               options={paymentsMethod}
               value={paymentMethod}
-              onChange={setPaymentMethod}
+              onChange={handlePayMethodChange}
               placeholder="Select a method"
             />
           </div>
@@ -194,7 +259,7 @@ const InvoiceCalculations: React.FC<InvoiceCalculationsProps> = ({
               id="payStatus"
               options={paymentStatusOptions}
               value={payStatus}
-              onChange={setPayStatus}
+              onChange={handlePayStatusChange}
               placeholder="Select a method"
             />
           </div>
@@ -207,7 +272,7 @@ const InvoiceCalculations: React.FC<InvoiceCalculationsProps> = ({
               Total:
             </span>
             <span className="text-2xl font-bold text-primary">
-              ${total?.toFixed(2)}
+              ${formatCurrency(calculations.total)}
             </span>
           </div>
         </div>
@@ -216,13 +281,13 @@ const InvoiceCalculations: React.FC<InvoiceCalculationsProps> = ({
         <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border">
           <div className="text-center">
             <div className="text-2xl font-bold text-primary">
-              {cartItems?.length}
+              {calculations.uniqueProducts}
             </div>
             <div className="text-sm text-muted-foreground">Unique Products</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-primary">
-              {cartItems?.reduce((total, item) => total + item?.quantity, 0)}
+              {calculations.totalUnits}
             </div>
             <div className="text-sm text-muted-foreground">Total Units</div>
           </div>
@@ -237,13 +302,13 @@ const InvoiceCalculations: React.FC<InvoiceCalculationsProps> = ({
             <div className="space-y-1 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Taxable Base:</span>
-                <span>${subtotal?.toFixed(2)}</span>
+                <span>${formatCurrency(calculations.subtotal)}</span>
               </div>
-              {discountAmount > 0 && (
+              {calculations.discountAmount > 0 && (
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Discount:</span>
                   <span className="text-destructive">
-                    -${discountAmount?.toFixed(2)}
+                    -${formatCurrency(calculations.discountAmount)}
                   </span>
                 </div>
               )}
@@ -251,15 +316,19 @@ const InvoiceCalculations: React.FC<InvoiceCalculationsProps> = ({
                 <span className="text-muted-foreground">
                   Base after discount:
                 </span>
-                <span>${subtotalAfterDiscount?.toFixed(2)}</span>
+                <span>
+                  ${formatCurrency(calculations.subtotalAfterDiscount)}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">VAT ({ivaRate}%):</span>
-                <span>${ivaAmount?.toFixed(2)}</span>
+                <span>${formatCurrency(calculations.ivaAmount)}</span>
               </div>
               <div className="flex justify-between font-medium border-t border-border pt-1">
                 <span>Total to pay:</span>
-                <span className="text-primary">${total?.toFixed(2)}</span>
+                <span className="text-primary">
+                  ${formatCurrency(calculations.total)}
+                </span>
               </div>
             </div>
           </div>
