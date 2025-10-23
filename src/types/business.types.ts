@@ -53,16 +53,16 @@ export interface ProductTag {
 }
 
 export interface Product {
-  id: string; // Firestore doc ID
+  id?: string; // Firestore doc ID
   name: string;
   description: string;
   cost: number;
-  sku: string;
   quantity: number; // cantidad total (suma de todas las bodegas)
+  warehouseStocks: Record<string, WarehouseStock>;
   prices: Price[]; // uno o más precios posibles
+  sku?: string;
   images?: ProductImage[]; // URLs opcionales
   additionalFeatures?: CustomAttribute[];
-  warehouseStocks?: Record<string, WarehouseStock>;
   minStock?: number; // Stock mínimo recomendado
   maxStock?: number; // Stock máximo permitido
   status?: "ACTIVE" | "INACTIVE" | "DISCONTINUED"; // Estados posibles

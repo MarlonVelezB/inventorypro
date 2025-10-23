@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { HeaderSection, LoadingScreen } from "../components";
 import type { Customer } from "../types/business.types";
-import { mockClients } from "../utils/testData";
+import { KEY_MODALS, mockClients } from "../utils/testData";
 import {
   CustomerForm,
   CustomerSearchBar,
@@ -20,7 +20,7 @@ const ClientManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [formMode, setFormMode] = useState<"create" | "edit">("create");
   const [sortConfig, setSortConfig] = useState({ key: "", direction: "asc" });
-  const { showModal, closeModal, openModal } = useModalStore();
+  const { isModalOpen, closeModal, openModal } = useModalStore();
   const { setCustomers, searchByTerm, deleteSelectedCustomers } =
     useCustomerStore();
 
@@ -97,7 +97,7 @@ const ClientManagement = () => {
       <CustomerSearchBar
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
-        onNewClient={openModal}
+        onNewClient={() => openModal(KEY_MODALS["add-prodcut"])}
       />
 
       <CustomerTable
@@ -109,8 +109,8 @@ const ClientManagement = () => {
       <Modal
         title="New Customer"
         closable={{ "aria-label": "Custom Close Button" }}
-        open={showModal}
-        onCancel={closeModal}
+        open={isModalOpen(KEY_MODALS["add-prodcut"])}
+        onCancel={() => closeModal(KEY_MODALS["add-prodcut"])}
         footer={null}
         width={800}
       >

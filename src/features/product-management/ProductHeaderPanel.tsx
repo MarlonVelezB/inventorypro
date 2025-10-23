@@ -2,8 +2,14 @@ import { Button, Input } from "antd";
 import { Icon } from "../../components";
 import "./styles.css";
 import useModalStore from "../../store/ModalStore";
+import { KEY_MODALS } from "../../utils/testData";
 
-const ProductHeaderPanel = () => {
+interface ProductHeaderPanelProps {
+  onImportItems: () => void;
+  onExportItems: () => void;
+}
+
+const ProductHeaderPanel: React.FC<ProductHeaderPanelProps> = ({onExportItems, onImportItems}) => {
   const {openModal} = useModalStore();
   return (
     <div className="bg-(--color-card) rounded-lg border border-border p-6 card-shadow">
@@ -28,17 +34,17 @@ const ProductHeaderPanel = () => {
             <Button type="text" icon={<Icon name="Filter" size={14} />}>
               Filters
             </Button>
-            <Button type="text" icon={<Icon name="Download" size={14} />}>
+            <Button type="text" icon={<Icon name="Download" size={14} />} onClick={onExportItems}>
               Export
             </Button>
-            <Button type="text" icon={<Icon name="Upload" size={14} />}>
+            <Button type="text" icon={<Icon name="Upload" size={14} />} onClick={onImportItems}>
               Import
             </Button>
             <Button
               type="primary"
               icon={<Icon name="Plus" />}
               iconPosition="end"
-              onClick={openModal}
+              onClick={() => openModal(KEY_MODALS["add-prodcut"])}
             >
               Add a Product
             </Button>

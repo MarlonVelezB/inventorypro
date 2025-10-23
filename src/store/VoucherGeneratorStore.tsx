@@ -50,7 +50,7 @@ const createInitialVoucher = (lastVoucher?: Voucher | null): Voucher => ({
   updatedAt: new Date().toISOString(),
 });
 
-const useVoucherGeneratorStore = create<VoucherGeneratorState>((set, get) => ({
+const useVoucherGeneratorStore = create<VoucherGeneratorState>((set) => ({
   voucher: createInitialVoucher(),
 
   // Establecer un voucher completo o actualizar parcialmente
