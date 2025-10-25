@@ -1,5 +1,14 @@
 import React, { useCallback, useState } from "react";
-import { Upload, Button, Table, message, Space, Tag, Divider, Image } from "antd";
+import {
+  Upload,
+  Button,
+  Table,
+  message,
+  Space,
+  Tag,
+  Divider,
+  Image,
+} from "antd";
 import * as XLSX from "xlsx";
 import type {
   CustomAttribute,
@@ -12,6 +21,8 @@ import { Icon } from "../../components";
 const { Dragger } = Upload;
 
 const ExcelUploader: React.FC = () => {
+  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+  const MAX_ROWS = 5000; // Por ejemplo, 5000 filas como máximo
   const [fileList, setFileList] = useState<any[]>([]);
   const [previewData, setPreviewData] = useState<Product[] | null>(null);
   const [loading, setLoading] = useState(false);
@@ -147,8 +158,21 @@ const ExcelUploader: React.FC = () => {
         const workbook = XLSX.read(data, { type: "binary" });
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
+        
+        const range = XLSX.utils.decode_range(worksheet["!ref"] || "A1:A1");
+        if (range.e.r > MAX_ROWS) {
+          range.e.r = MAX_ROWS; // Ajustar el límite de fila
+          message.warning(
+            `The sheet was truncated to the first ${MAX_ROWS} rows.`
+          );
+        }
+
+        //@ts-ignore
+        const limitedRange = XLSX.utils.encode_range(range);
+
         const jsonSheetData: any[] = XLSX.utils.sheet_to_json(worksheet, {
           header: 1,
+          range: limitedRange, // Usar el rango limitado
         });
 
         const headers = jsonSheetData[0];
@@ -195,7 +219,16 @@ const ExcelUploader: React.FC = () => {
   };
 
   const uploadProps = {
-    beforeUpload: () => false,
+    beforeUpload: (file: any) => {
+      // ⚠️ Importante: Devuelve false para que Antd no haga la subida automática
+      if (file.size > MAX_FILE_SIZE) {
+        message.error(
+          `File size must be less than ${MAX_FILE_SIZE / 1024 / 1024}MB`
+        );
+        return Upload.LIST_IGNORE; // Ignorar el archivo en la lista
+      }
+      return false; // Permite el procesamiento manual
+    },
     onChange: handleFileChange,
     fileList: fileList,
     accept: ".xlsx,.xls,.csv",
@@ -372,9 +405,7 @@ const ExcelUploader: React.FC = () => {
             title: "Images",
             key: "images",
             width: 150,
-            render: (_: any, record: Product) => (
-                renderImage(record.images)
-            ),
+            render: (_: any, record: Product) => renderImage(record.images),
           },
         ]
       : []),

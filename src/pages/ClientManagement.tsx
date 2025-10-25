@@ -19,7 +19,7 @@ const ClientManagement = () => {
   const [selectedClients, setSelectedClients] = useState<Customer[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [formMode, setFormMode] = useState<"create" | "edit">("create");
-  const [sortConfig, setSortConfig] = useState({ key: "", direction: "asc" });
+  // const [sortConfig, setSortConfig] = useState({ key: "", direction: "asc" });
   const { isModalOpen, closeModal, openModal } = useModalStore();
   const { setCustomers, searchByTerm, deleteSelectedCustomers } =
     useCustomerStore();
@@ -41,18 +41,18 @@ const ClientManagement = () => {
     searchByTerm(searchTerm?.toLowerCase());
   }, [clients, searchTerm]);
 
-  const handleSort = (key: string) => {
-    let direction = "asc";
-    if (sortConfig?.key === key && sortConfig?.direction === "asc") {
-      direction = "desc";
-    }
-    setSortConfig({ key, direction });
-  };
+  // const handleSort = (key: string) => {
+  //   let direction = "asc";
+  //   if (sortConfig?.key === key && sortConfig?.direction === "asc") {
+  //     direction = "desc";
+  //   }
+  //   setSortConfig({ key, direction });
+  // };
 
-  const handleBulkExport = () => {
-    console.log("Exporting selected clients:", selectedClients);
-    // Implement bulk export logic
-  };
+  // const handleBulkExport = () => {
+  //   console.log("Exporting selected clients:", selectedClients);
+  //   // Implement bulk export logic
+  // };
 
   const deleteRowsSelected = async () => {
     const confirmed = await confirmService.danger(
