@@ -10,7 +10,7 @@ import { Button, Input } from "antd";
 import { Icon } from "../../components";
 import useModalStore from "../../store/ModalStore";
 import { useState } from "react";
-import { mockClients } from "../../utils/testData";
+import { KEY_MODALS, mockClients } from "../../utils/testData";
 import type { Customer } from "../../types/business.types";
 import { useMessageStore } from "../../store/MessageStore";
 
@@ -283,7 +283,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
 
       {/* Actions */}
       <div className="flex items-center justify-end space-x-3 mt-6 pt-4 border-t border-border">
-        <Button variant="outlined" onClick={closeModal} disabled={isLoading}>
+        <Button variant="outlined" onClick={() => closeModal(KEY_MODALS["add-customer"])} disabled={isLoading}>
           Cancelar
         </Button>
         <Button

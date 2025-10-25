@@ -1,8 +1,8 @@
 import { Space, Table, Image, type TableProps, Button, Tooltip } from "antd";
 import { useMemo, useCallback } from "react";
 import type { Product } from "../../types/business.types";
-import { productsForUI } from "../../utils/testData";
 import { Icon } from "../../components";
+import { useProductStore } from "../../store/ProductStore";
 
 interface StockStatus {
   text: string;
@@ -10,6 +10,9 @@ interface StockStatus {
 }
 
 const ProductTable = () => {
+
+  const { products } = useProductStore();
+
   const getColorClass = useCallback((color: StockStatus["color"]) => {
     const colorMap = {
       success: "text-green-600",
@@ -231,7 +234,7 @@ const ProductTable = () => {
     <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
       <Table<Product>
         columns={columns}
-        dataSource={productsForUI}
+        dataSource={products}
         rowKey="id"
         scroll={{ x: 1200 }}
         pagination={{

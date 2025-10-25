@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { HeaderSection, LoadingScreen } from "../components";
 import type { Customer } from "../types/business.types";
-import { mockClients } from "../utils/testData";
+import { KEY_MODALS, mockClients } from "../utils/testData";
 import {
   CustomerForm,
   CustomerSearchBar,
@@ -19,8 +19,8 @@ const ClientManagement = () => {
   const [selectedClients, setSelectedClients] = useState<Customer[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [formMode, setFormMode] = useState<"create" | "edit">("create");
-  const [sortConfig, setSortConfig] = useState({ key: "", direction: "asc" });
-  const { showModal, closeModal, openModal } = useModalStore();
+  // const [sortConfig, setSortConfig] = useState({ key: "", direction: "asc" });
+  const { isModalOpen, closeModal, openModal } = useModalStore();
   const { setCustomers, searchByTerm, deleteSelectedCustomers } =
     useCustomerStore();
 
@@ -41,18 +41,18 @@ const ClientManagement = () => {
     searchByTerm(searchTerm?.toLowerCase());
   }, [clients, searchTerm]);
 
-  const handleSort = (key: string) => {
-    let direction = "asc";
-    if (sortConfig?.key === key && sortConfig?.direction === "asc") {
-      direction = "desc";
-    }
-    setSortConfig({ key, direction });
-  };
+  // const handleSort = (key: string) => {
+  //   let direction = "asc";
+  //   if (sortConfig?.key === key && sortConfig?.direction === "asc") {
+  //     direction = "desc";
+  //   }
+  //   setSortConfig({ key, direction });
+  // };
 
-  const handleBulkExport = () => {
-    console.log("Exporting selected clients:", selectedClients);
-    // Implement bulk export logic
-  };
+  // const handleBulkExport = () => {
+  //   console.log("Exporting selected clients:", selectedClients);
+  //   // Implement bulk export logic
+  // };
 
   const deleteRowsSelected = async () => {
     const confirmed = await confirmService.danger(
@@ -97,7 +97,7 @@ const ClientManagement = () => {
       <CustomerSearchBar
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
-        onNewClient={openModal}
+        onNewClient={() => openModal(KEY_MODALS["add-prodcut"])}
       />
 
       <CustomerTable
@@ -109,8 +109,8 @@ const ClientManagement = () => {
       <Modal
         title="New Customer"
         closable={{ "aria-label": "Custom Close Button" }}
-        open={showModal}
-        onCancel={closeModal}
+        open={isModalOpen(KEY_MODALS["add-prodcut"])}
+        onCancel={() => closeModal(KEY_MODALS["add-prodcut"])}
         footer={null}
         width={800}
       >

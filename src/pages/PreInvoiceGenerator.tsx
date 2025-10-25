@@ -28,7 +28,7 @@ const PreInvoiceGenerator: React.FC = () => {
   const [paymentMethodSelect, setPaymentMethodSelect] =
     useState<PaymentMethodCode | null>(null);
 
-  const { voucher, setVoucher, calculateTotals, updateItems, resetVoucher } =
+  const { voucher, setVoucher, calculateTotals, updateItems } =
     useVoucherGeneratorStore();
 
   const prevWarehouseRef = useRef<string | null>(null);
@@ -181,7 +181,7 @@ const PreInvoiceGenerator: React.FC = () => {
     setDiscount(newDiscount);
   };
 
-  const handleIvaRateChange = (newIvaRate: number) => {
+  const handleIvaRateChange = (_: number) => {
     calculateTotals();
   };
 
