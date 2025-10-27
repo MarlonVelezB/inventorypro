@@ -603,7 +603,6 @@ export const mockPreInvoices: Voucher[] = [
   },
 ];
 
-
 export const mockPaymentsMethod: PaymentMethod[] = [
   { code: "01", label: "SIN UTILIZACION DEL SISTEMA FINANCIERO" },
   { code: "16", label: "TARJETA DE DEBITO" },

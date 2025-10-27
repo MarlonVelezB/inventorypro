@@ -16,16 +16,25 @@ import type {
   Product,
   WarehouseStock,
 } from "../../types/business.types";
-import { Icon } from "../../components";
+import { Icon, LoadingScreen } from "../../components";
+import { productsService } from "../../service/core/productService";
+import { useConfirmStore } from "../../store/ConfirmStore";
+import { useProductStore } from "../../store/ProductStore";
 
 const { Dragger } = Upload;
 
-const ExcelUploader: React.FC = () => {
+interface ExcelUploaderProps {
+  finalyImport: () => void;
+}
+
+const ExcelUploader: React.FC<ExcelUploaderProps> = ({ finalyImport }: ExcelUploaderProps) => {
   const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
   const MAX_ROWS = 5000; // Por ejemplo, 5000 filas como máximo
   const [fileList, setFileList] = useState<any[]>([]);
-  const [previewData, setPreviewData] = useState<Product[] | null>(null);
+  const [previewData, setPreviewData] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
+  const { showConfirm } = useConfirmStore();
+  const { setProducts } = useProductStore();
 
   const handleFileChange = (info: any) => {
     setFileList(info.fileList.slice(-1));
@@ -122,18 +131,22 @@ const ExcelUploader: React.FC = () => {
         quantity: parseInt(row[COL_MAP.TOTAL_QTY] || "0", 10),
         prices: prices,
         warehouseStocks: warehouseStocks,
-        minStock: parseInt(row[COL_MAP.MIN_STOCK] || "0", 10) || undefined,
-        maxStock: parseInt(row[COL_MAP.MAX_STOCK] || "0", 10) || undefined,
+        minStock: parseInt(row[COL_MAP.MIN_STOCK] || "0", 10) || 1,
+        maxStock:
+          parseInt(row[COL_MAP.MAX_STOCK] || "0", 10) ||
+          parseInt(row[COL_MAP.TOTAL_QTY] || "0", 10),
         status: (row[COL_MAP.STATUS] as Product["status"]) || "ACTIVE",
         images: row[COL_MAP.MAIN_IMG]
           ? [{ url: String(row[COL_MAP.MAIN_IMG]), isPrimary: true }]
-          : undefined,
+          : [],
         tags: row[COL_MAP.TAGS]
           ? String(row[COL_MAP.TAGS])
               .split(",")
               .map((tag) => ({ value: tag.trim() }))
-          : undefined,
+          : [],
         additionalFeatures: additionalFeatures,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       };
 
       products.push(product);
@@ -158,7 +171,7 @@ const ExcelUploader: React.FC = () => {
         const workbook = XLSX.read(data, { type: "binary" });
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
-        
+
         const range = XLSX.utils.decode_range(worksheet["!ref"] || "A1:A1");
         if (range.e.r > MAX_ROWS) {
           range.e.r = MAX_ROWS; // Ajustar el límite de fila
@@ -180,6 +193,13 @@ const ExcelUploader: React.FC = () => {
         const importedProducts = mapExcelDataToProducts({ headers, rows });
 
         console.log("Productos Importados:", importedProducts);
+
+        // const result = haveSameKeys(
+        //   importedProducts[0],
+        //   productsForUI[0]
+        // );
+
+        // console.log(result); // false
 
         setPreviewData(importedProducts);
         setLoading(false);
@@ -203,18 +223,43 @@ const ExcelUploader: React.FC = () => {
 
   const handleClearSelection = () => {
     setFileList([]);
-    setPreviewData(null);
+    setPreviewData([]);
     message.info("Selection cleared");
   };
 
-  const handleSaveImport = () => {
-    console.log("Saving products:", previewData);
-    message.success("Data saved successfully!");
-    handleClearSelection();
+  const handleSaveImport = async () => {
+    try {
+      console.log("Saving products:", previewData);
+      showConfirm(
+        {
+          title: "Are you sure?",
+          message: "Do you want to save the imported items?",
+          type: "info", // info | warning | success | danger
+          confirmText: "Save",
+          cancelText: "Cancel",
+        },
+        async () => {
+          try {
+            setLoading(true);
+            const res = await productsService.createBatch(previewData);
+            console.log("RES: ", res);
+            setLoading(false);
+            setProducts(res.data);
+            handleClearSelection();
+            finalyImport();
+          } catch (error) {
+            console.error("Error al eliminar el producto", error);
+            setLoading(false);
+          }
+        }
+      );
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleCancel = () => {
-    setPreviewData(null);
+    setPreviewData([]);
     message.info("Import cancelled");
   };
 
@@ -431,8 +476,9 @@ const ExcelUploader: React.FC = () => {
 
   return (
     <div className="w-full">
+      {loading && <LoadingScreen message="Saving Products..." />}
       {/* Upload Section */}
-      {!previewData ? (
+      {previewData.length === 0 ? (
         <div className="space-y-6">
           <div className="text-center mb-6">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 mb-4 shadow-lg">
@@ -536,6 +582,7 @@ const ExcelUploader: React.FC = () => {
                 Cancel
               </Button>
               <Button
+                disabled={previewData.length === 0}
                 type="primary"
                 icon={<Icon name="Save" size={16} />}
                 onClick={handleSaveImport}
