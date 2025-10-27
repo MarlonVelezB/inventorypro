@@ -92,25 +92,12 @@ export const getPaymentMethodLabel = (methodCode: string) => {
   return mockPaymentsMethod.find((method: PaymentMethod) => method.code === methodCode)?.label;
 }
 
-export function deepCompareObjects(obj1: Record<string, any>, obj2: Record<string, any>) {
-  const keys1 = Object.keys(obj1);
-  const keys2 = Object.keys(obj2);
-
-  const allKeys = Array.from(new Set([...keys1, ...keys2]));
-
-  const differences: Record<string, { obj1?: any; obj2?: any }> = {};
-
-  allKeys.forEach(key => {
-    if (!(key in obj1)) {
-      differences[key] = { obj1: undefined, obj2: obj2[key] };
-    } else if (!(key in obj2)) {
-      differences[key] = { obj1: obj1[key], obj2: undefined };
-    } else if (obj1[key] !== obj2[key]) {
-      differences[key] = { obj1: obj1[key], obj2: obj2[key] };
-    }
-  });
-
-  const identical = Object.keys(differences).length === 0;
-
-  return { identical, differences: identical ? null : differences };
+export function haveSameKeys(
+  obj1: Record<string, any>,
+  obj2: Record<string, any>
+): boolean {
+  const keys1 = Object.keys(obj1).sort();
+  const keys2 = Object.keys(obj2).sort();
+  return JSON.stringify(keys1) === JSON.stringify(keys2);
 }
+

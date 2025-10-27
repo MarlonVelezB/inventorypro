@@ -28,6 +28,7 @@ const ProductManagement = () => {
       try {
         // controller.signal "antena" que escucha si se canceló algo
         const res = await productsService.getAll(controller.signal);
+        console.log('RES: ', res);
         setProducts(res);
       } catch (error) {
         if ((error as Error).name !== "AbortError") {
@@ -50,6 +51,10 @@ const ProductManagement = () => {
   const handleImportItems = () => {
     openModal(KEY_MODALS["import-items"]);
   };
+
+  const handleFinalyImport = () => {
+    closeModal(KEY_MODALS["import-items"]);
+  }
 
   if (isLoading) {
     return <LoadingScreen message="Loading products..." />;
@@ -88,7 +93,7 @@ const ProductManagement = () => {
         footer={null}
         width={800}
       >
-        <ExcelUploader />
+        <ExcelUploader finalyImport={handleFinalyImport}/>
       </Modal>
     </div>
   );
