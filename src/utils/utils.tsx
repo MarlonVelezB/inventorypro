@@ -1,4 +1,10 @@
-import type { PaymentMethod, Price, Voucher, WarehouseStock } from "../types/business.types";
+import type {
+  PaymentMethod,
+  Price,
+  Product,
+  Voucher,
+  WarehouseStock,
+} from "../types/business.types";
 import { mockPaymentsMethod } from "./testData";
 
 export const getStockInWarehouseSelected = (
@@ -12,7 +18,7 @@ export const getStockInWarehouseSelected = (
 
 export const getPrice = (productPrices?: Price[]) => {
   const price = productPrices?.find(
-    (price: Price) => price.label === "Regular Price"
+    (price: Price) => price.label === "Regular"
   );
   return price?.amount ? price?.amount : 0;
 };
@@ -89,8 +95,10 @@ export const getVoucherNumberSRI = (
 };
 
 export const getPaymentMethodLabel = (methodCode: string) => {
-  return mockPaymentsMethod.find((method: PaymentMethod) => method.code === methodCode)?.label;
-}
+  return mockPaymentsMethod.find(
+    (method: PaymentMethod) => method.code === methodCode
+  )?.label;
+};
 
 export function haveSameKeys(
   obj1: Record<string, any>,
@@ -101,3 +109,45 @@ export function haveSameKeys(
   return JSON.stringify(keys1) === JSON.stringify(keys2);
 }
 
+export function generateSimpleSKU(product: Product): string {
+  const normalize = (text: string, length: number = 3) =>
+    text
+      ?.toUpperCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "") // elimina acentos
+      .replace(/[^A-Z0-9]/g, "") // solo letras y números
+      .substring(0, length) || "";
+
+  const nameCode = normalize(product.name, 3);
+
+  // Tomar hasta 2 características de additionalFeatures
+  const featureCodes = (product.additionalFeatures || [])
+    .slice(0, 2) // primeras 2
+    .map((attr) => normalize(attr.value, 3)); // ej: "ALG", "RED"
+
+  const months = [
+    "ENE",
+    "FEB",
+    "MAR",
+    "ABR",
+    "MAY",
+    "JUN",
+    "JUL",
+    "AGO",
+    "SEP",
+    "OCT",
+    "NOV",
+    "DIC",
+  ];
+
+  const date = new Date(product.createdAt ?? new Date());
+  const monthCode = months[date.getMonth()];
+  const year = String(date.getFullYear()).slice(-2);
+
+  // Construir partes dinámicamente
+  const parts = [nameCode, ...featureCodes, `${monthCode}${year}`].filter(
+    Boolean
+  );
+
+  return parts.join("-");
+}

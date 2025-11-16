@@ -1,55 +1,63 @@
 import { Alert, Select } from "antd";
 import { Icon } from "../../components";
+import { useWarehouseStore } from "../../store/WarehouseStore";
+import { useEffect, useMemo, useState } from "react";
+import { warehousesService } from "../../service/core/warehouseService";
+import type { Warehouse } from "../../types/business.types";
 
-interface WarehouseSelector {
-  selectedWarehouse: any;
-  onWarehouseSelect: (warehouse: any) => void;
-  className: string;
+interface WarehouseSelectorProps {
+  selectedWarehouse: string | null;
+  onWarehouseSelect: (code: string) => void;
+  className?: string;
 }
 
-const WarehouseSelector: React.FC<WarehouseSelector> = ({
+const WarehouseSelector: React.FC<WarehouseSelectorProps> = ({
   selectedWarehouse,
   onWarehouseSelect,
   className = "",
 }) => {
-  const mockWarehouses = [
-    {
-      value: "WH001",
-      label: "Almacén Central Madrid",
-      description: "Calle Industria 45, Madrid - 1,250 productos",
-      address: "Calle Industria 45, Madrid",
-      totalProducts: 1250,
-      code: "WH001",
-    },
-    {
-      value: "WH002",
-      label: "Almacén Barcelona Norte",
-      description: "Polígono Industrial Can Roca, Barcelona - 890 productos",
-      address: "Polígono Industrial Can Roca, Barcelona",
-      totalProducts: 890,
-      code: "WH002",
-    },
-    {
-      value: "WH003",
-      label: "Almacén Valencia Sur",
-      description: "Zona Franca Valencia, Valencia - 650 productos",
-      address: "Zona Franca Valencia, Valencia",
-      totalProducts: 650,
-      code: "WH003",
-    },
-    {
-      value: "WH004",
-      label: "Almacén Sevilla",
-      description: "Parque Empresarial Sevilla Este - 420 productos",
-      address: "Parque Empresarial Sevilla Este",
-      totalProducts: 420,
-      code: "WH004",
-    },
-  ];
+  const { warehouses, setWarehouses } = useWarehouseStore();
+  const [selectOptions, setSelectOptions] = useState<
+    { label: string; value: string }[]
+  >([]);
 
-  const selectedWarehouseData = mockWarehouses?.find(
+  useEffect(() => {
+    // API del navegador que te permite cancelar operaciones asíncronas
+    // Lo usamos para poder abortar una peticio HTPP cuando se desponde el componente y asi evitar el doble render
+    const controller = new AbortController(); // Disponible globalmente
+    const loadWarehouses = async () => {
+      try {
+        // controller.signal "antena" que escucha si se canceló algo
+        const res = await warehousesService.getAll(controller.signal);
+        const warehouseParseSelect = res.map((w: Warehouse) => ({
+          label: w.name,
+          value: w.code,
+        }));
+        setSelectOptions(warehouseParseSelect);
+        setWarehouses(res);
+      } catch (error) {
+        if ((error as Error).name !== "AbortError") {
+          setWarehouses([]);
+        }
+      }
+    };
+
+    warehouses.length === 0 && loadWarehouses();
+
+    return () => {
+      controller.abort(); // Cancela cuando el componente se desmonta
+    };
+  }, []);
+
+  const selectedWarehouseData = selectOptions?.find(
     (wh) => wh?.value === selectedWarehouse
   );
+
+  const selectedWarehouseObject = useMemo(() => {
+    // La dependencia es 'selectedWarehouse' (el código) y 'warehouses' (el array)
+    // Solo buscamos el objeto completo cuando el código seleccionado o la lista de almacenes cambian.
+    return warehouses.find((w: Warehouse) => w.code === selectedWarehouse);
+  }, [selectedWarehouse, warehouses]); // Dependencias: Si alguna cambia, recalcula.
 
   return (
     <div className={`space-y-4 ${className}`}>
@@ -64,7 +72,7 @@ const WarehouseSelector: React.FC<WarehouseSelector> = ({
         <label>*Source Warehouse</label>
         <Select
           placeholder="Select warehouse..."
-          options={mockWarehouses}
+          options={selectOptions}
           value={selectedWarehouse}
           onChange={onWarehouseSelect}
           showSearch
@@ -85,24 +93,17 @@ const WarehouseSelector: React.FC<WarehouseSelector> = ({
             <div className="flex-1 space-y-2">
               <div className="flex items-center justify-between">
                 <h4 className="font-medium text-(--color-foreground)">
-                  {selectedWarehouseData?.label}
+                  {selectedWarehouseObject?.name}
                 </h4>
                 <span className="text-xs text-(--color-success) px-2 py-1 rounded">
-                  {selectedWarehouseData?.code}
+                  {selectedWarehouseObject?.code}
                 </span>
               </div>
               <div className="space-y-1 text-sm text-(--color-muted-foreground)">
                 <div className="flex items-center space-x-2">
                   <Icon name="MapPin" size={14} />
-                  <span>{selectedWarehouseData?.address}</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Icon name="Package" size={14} />
                   <span>
-                    {selectedWarehouseData?.totalProducts?.toLocaleString(
-                      "en-US"
-                    )}{" "}
-                    products available
+                    {selectedWarehouseObject?.address}
                   </span>
                 </div>
               </div>
