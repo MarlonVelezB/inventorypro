@@ -20,6 +20,7 @@ const ShoppingCart: React.FC<ShoppingCartProps> = ({
     newQuantity: string
   ) => {
     const item = cartItems?.find((item) => item?.id === itemId);
+    console.log('item: ', item)
     if (!item) return;
 
     const quantity = parseInt(newQuantity);
@@ -199,8 +200,8 @@ const ShoppingCart: React.FC<ShoppingCartProps> = ({
               <div className="flex items-start space-x-3">
                 <div className="w-16 h-16 bg-muted rounded-lg overflow-hidden">
                   <img
-                    src={item?.image}
-                    alt={item?.name}
+                    src={item?.image ? item?.image : ''}
+                    alt={item?.name ? item?.name : ''}
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       (e.currentTarget as HTMLImageElement).src =

@@ -1,7 +1,7 @@
-import { Space, Table, Image, type TableProps, Button, Tooltip } from "antd";
+import { Space, Table, type TableProps, Button, Tooltip } from "antd";
 import { useMemo, useCallback } from "react";
 import type { Product } from "../../types/business.types";
-import { Icon } from "../../components";
+import { Icon, RenderImage } from "../../components";
 import { useProductStore } from "../../store/ProductStore";
 
 interface StockStatus {
@@ -9,7 +9,7 @@ interface StockStatus {
   color: "success" | "warning" | "destructive" | "foreground";
 }
 
-const ProductTable = () => {
+const ProductTable = ({loadingData}: {loadingData: boolean;}) => {
 
   const { products } = useProductStore();
 
@@ -89,34 +89,6 @@ const ProductTable = () => {
     );
   }, []);
 
-  const renderImage = useCallback((images: Product["images"]) => {
-    if (!images?.length) {
-      return (
-        <div className="w-20 h-20 bg-gray-200 flex items-center justify-center rounded">
-          <span className="text-gray-500 text-xs">No Image</span>
-        </div>
-      );
-    }
-
-    const primaryImage = images.find((img) => img.isPrimary) || images[0];
-
-    return (
-      <Image.PreviewGroup
-        items={images.map((img) => ({
-          src: img.url,
-          alt: img.alt || "Product Image",
-        }))}
-      >
-        <Image
-          width={80}
-          src={primaryImage.url}
-          alt={primaryImage.alt || "Product"}
-          fallback="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
-        />
-      </Image.PreviewGroup>
-    );
-  }, []);
-
   const handleEdit = useCallback((record: Product) => {
     console.log("Edit product:", record.id);
     // Implementar lógica de edición
@@ -139,7 +111,9 @@ const ProductTable = () => {
         dataIndex: "images",
         key: "image",
         width: 100,
-        render: renderImage,
+        render: (_, record) => (
+           <RenderImage images={record.images}/>
+        ),
       },
       {
         title: "SKU",
@@ -220,7 +194,7 @@ const ProductTable = () => {
       },
     ],
     [
-      renderImage,
+      RenderImage,
       renderStockStatus,
       renderWarehouseStock,
       renderPriceAndCost,
@@ -236,6 +210,7 @@ const ProductTable = () => {
         columns={columns}
         dataSource={products}
         rowKey="id"
+        loading={loadingData}
         scroll={{ x: 1200 }}
         pagination={{
           defaultPageSize: 10,

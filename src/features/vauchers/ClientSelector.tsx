@@ -336,7 +336,7 @@ const ClientSelector: React.FC<ClientSelectorProps> = ({
                           <span className="font-medium text-(--color-foreground)">
                             {client.name}
                           </span>
-                          <span className="text-xs bg-[var(--color-primary)]/10 text-(--color-primary) px-2 py-0.5 rounded">
+                          <span className="text-xs bg-(--color-primary)/10 text-(--color-primary) px-2 py-0.5 rounded">
                             {client.code}
                           </span>
                         </div>

@@ -20,6 +20,7 @@ import { Icon, LoadingScreen } from "../../components";
 import { productsService } from "../../service/core/productService";
 import { useConfirmStore } from "../../store/ConfirmStore";
 import { useProductStore } from "../../store/ProductStore";
+import { generateSimpleSKU } from "../../utils/utils";
 
 const { Dragger } = Upload;
 
@@ -27,14 +28,16 @@ interface ExcelUploaderProps {
   finalyImport: () => void;
 }
 
-const ExcelUploader: React.FC<ExcelUploaderProps> = ({ finalyImport }: ExcelUploaderProps) => {
+const ExcelUploader: React.FC<ExcelUploaderProps> = ({
+  finalyImport,
+}: ExcelUploaderProps) => {
   const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
   const MAX_ROWS = 5000; // Por ejemplo, 5000 filas como máximo
   const [fileList, setFileList] = useState<any[]>([]);
   const [previewData, setPreviewData] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const { showConfirm } = useConfirmStore();
-  const { setProducts } = useProductStore();
+  const { setProducts, products } = useProductStore();
 
   const handleFileChange = (info: any) => {
     setFileList(info.fileList.slice(-1));
@@ -148,8 +151,12 @@ const ExcelUploader: React.FC<ExcelUploaderProps> = ({ finalyImport }: ExcelUplo
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
+      
+      const sku = String(row[COL_MAP.SKU])
+        ? generateSimpleSKU(product)
+        : String(row[COL_MAP.SKU]);
 
-      products.push(product);
+      products.push({ ...product, sku: sku });
     });
     return products;
   };
@@ -244,7 +251,7 @@ const ExcelUploader: React.FC<ExcelUploaderProps> = ({ finalyImport }: ExcelUplo
             const res = await productsService.createBatch(previewData);
             console.log("RES: ", res);
             setLoading(false);
-            setProducts(res.data);
+            setProducts([...products, ...res.data]);
             handleClearSelection();
             finalyImport();
           } catch (error) {
@@ -481,7 +488,7 @@ const ExcelUploader: React.FC<ExcelUploaderProps> = ({ finalyImport }: ExcelUplo
       {previewData.length === 0 ? (
         <div className="space-y-6">
           <div className="text-center mb-6">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 mb-4 shadow-lg">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-linear-to-r from-green-400 to-emerald-500 mb-4 shadow-lg">
               <Icon name="FileSpreadsheet" size={32} className="text-white" />
             </div>
             <h2 className="text-2xl font-bold text-gray-800 mb-2">
@@ -509,7 +516,7 @@ const ExcelUploader: React.FC<ExcelUploaderProps> = ({ finalyImport }: ExcelUplo
           </Dragger>
 
           {fileList.length > 0 && (
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-5 border border-blue-200">
+            <div className="bg-linear-to-r from-blue-50 to-indigo-50 rounded-lg p-5 border border-blue-200">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-blue-500 flex items-center justify-center">
@@ -546,7 +553,7 @@ const ExcelUploader: React.FC<ExcelUploaderProps> = ({ finalyImport }: ExcelUplo
                   onClick={handleImport}
                   loading={loading}
                   size="large"
-                  className="bg-gradient-to-r from-blue-500 to-blue-600 border-0"
+                  className="bg-linear-to-r from-blue-500 to-blue-600 border-0"
                 >
                   Import File
                 </Button>
@@ -587,7 +594,7 @@ const ExcelUploader: React.FC<ExcelUploaderProps> = ({ finalyImport }: ExcelUplo
                 icon={<Icon name="Save" size={16} />}
                 onClick={handleSaveImport}
                 size="large"
-                className="bg-gradient-to-r from-green-500 to-emerald-600 border-0"
+                className="bg-linear-to-r from-green-500 to-emerald-600 border-0"
               >
                 Save Import
               </Button>

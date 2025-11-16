@@ -102,6 +102,7 @@ export interface VoucherItem {
   image?: string;
   quantity: number;
   unitPrice: number;
+  availableStock: number;
   lineTotal: number;
 }
 

@@ -635,3 +635,40 @@ export const KEY_MODALS = {
   'add-customer' : 'modal-add-customer',
   'import-items' : 'import-items',
 }
+
+
+  // const mockWarehouses = [
+  //   {
+  //     value: "WH001",
+  //     label: "Almacén Central Madrid",
+  //     description: "Calle Industria 45, Madrid - 1,250 productos",
+  //     address: "Calle Industria 45, Madrid",
+  //     totalProducts: 1250,
+  //     code: "WH001",
+  //   },
+  //   {
+  //     value: "WH002",
+  //     label: "Almacén Barcelona Norte",
+  //     description: "Polígono Industrial Can Roca, Barcelona - 890 productos",
+  //     address: "Polígono Industrial Can Roca, Barcelona",
+  //     totalProducts: 890,
+  //     code: "WH002",
+  //   },
+  //   {
+  //     value: "WH003",
+  //     label: "Almacén Valencia Sur",
+  //     description: "Zona Franca Valencia, Valencia - 650 productos",
+  //     address: "Zona Franca Valencia, Valencia",
+  //     totalProducts: 650,
+  //     code: "WH003",
+  //   },
+  //   {
+  //     value: "WH004",
+  //     label: "Almacén Sevilla",
+  //     description: "Parque Empresarial Sevilla Este - 420 productos",
+  //     address: "Parque Empresarial Sevilla Este",
+  //     totalProducts: 420,
+  //     code: "WH004",
+  //   },
+  // ];
+

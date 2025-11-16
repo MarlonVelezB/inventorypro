@@ -5,37 +5,30 @@ import {
   ProductTable,
 } from "../features/product-management";
 import useModalStore from "../store/ModalStore";
-import { HeaderSection, LoadingScreen } from "../components";
+import { HeaderSection } from "../components";
 import { KEY_MODALS } from "../utils/testData";
 import ExcelUploader from "../features/export-excel/ExcelUploader";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useProductStore } from "../store/ProductStore";
 import { productsService } from "../service/core/productService";
 
 const ProductManagement = () => {
   const { closeModal, isModalOpen, openModal } = useModalStore();
-  const [isLoading, setIsLoading] = useState(true);
-  const { setProducts } = useProductStore();
+  const { setProducts, products } = useProductStore();
 
   useEffect(() => {
     // API del navegador que te permite cancelar operaciones asíncronas
     // Lo usamos para poder abortar una peticio HTPP cuando se desponde el componente y asi evitar el doble render
     const controller = new AbortController(); // Disponible globalmente
-
     const loadProducts = async () => {
-      setIsLoading(true);
-
       try {
         // controller.signal "antena" que escucha si se canceló algo
         const res = await productsService.getAll(controller.signal);
-        console.log('RES: ', res);
         setProducts(res);
       } catch (error) {
         if ((error as Error).name !== "AbortError") {
           setProducts([]);
         }
-      } finally {
-        setIsLoading(false);
       }
     };
 
@@ -54,11 +47,7 @@ const ProductManagement = () => {
 
   const handleFinalyImport = () => {
     closeModal(KEY_MODALS["import-items"]);
-  }
-
-  if (isLoading) {
-    return <LoadingScreen message="Loading products..." />;
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -72,7 +61,7 @@ const ProductManagement = () => {
         onImportItems={handleImportItems}
       />
 
-      <ProductTable />
+      <ProductTable loadingData={products.length === 0} />
 
       <Modal
         title="New Product"
@@ -93,7 +82,7 @@ const ProductManagement = () => {
         footer={null}
         width={800}
       >
-        <ExcelUploader finalyImport={handleFinalyImport}/>
+        <ExcelUploader finalyImport={handleFinalyImport} />
       </Modal>
     </div>
   );
